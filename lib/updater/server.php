@@ -100,7 +100,7 @@ class Ithemes_Updater_Server {
 			$GLOBALS['ithemes-updater-object']->enable_ssl_ca_patch();
 			$response = wp_remote_post( self::$secure_server_url . $request, $remote_post_args );
 
-			if ( ! is_wp_error( $response ) )
+			if ( !is_wp_error( $response ) )
 				$options['use_ca_patch'] = true;
 		}
 
@@ -111,7 +111,7 @@ class Ithemes_Updater_Server {
 		}
 
 
-		if ( ! $options['use_ca_patch'] )
+		if ( !$options['use_ca_patch'] )
 			$GLOBALS['ithemes-updater-object']->disable_ssl_ca_patch();
 
 		$GLOBALS['ithemes-updater-object']->update_options( $options );
@@ -123,8 +123,8 @@ class Ithemes_Updater_Server {
 
 		$body = json_decode( $response['body'], true );
 
-		if ( ! empty( $body['error'] ) )
-			return new WP_Error( $body['error']['type'], sprintf( __( 'An error occurred when communicating with the iThemes update server: %s (%s)', 'it-l10n-exchange-addon-2checkout' ), $body['error']['message'], $body['error']['code'] ) );
+		if ( !empty( $body['error'] ) )
+			return new WP_Error( $body['error']['type'], sprintf( __( 'An error occurred when communicating with the iThemes update server: %s (%s)', 'it-l10n-exchange' ), $body['error']['message'], $body['error']['code'] ) );
 
 
 		return $body;

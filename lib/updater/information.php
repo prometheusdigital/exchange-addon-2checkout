@@ -16,7 +16,7 @@ class Ithemes_Updater_Information {
 		require_once( dirname( __FILE__ ) . '/packages.php' );
 		$details = Ithemes_Updater_Packages::get_full_details();
 
-		if ( ! isset( $details['packages'][$path] ) )
+		if ( !isset( $details['packages'][$path] ) )
 			return false;
 
 
@@ -25,10 +25,10 @@ class Ithemes_Updater_Information {
 		$url = "http://package-info.ithemes.com/{$package['package']}/information.json";
 		$response = wp_remote_get( $url );
 
-		if ( ! is_wp_error( $response ) && isset( $response['body'] ) ) {
+		if ( !is_wp_error( $response ) && isset( $response['body'] ) ) {
 			$info = json_decode( $response['body'] );
 
-			if ( is_object( $info ) && ! empty( $info->name ) && ! empty( $info->version ) ) {
+			if ( is_object( $info ) && !empty( $info->name ) && !empty( $info->version ) ) {
 				$info->slug = dirname( $path );
 				$info->download_link = $package['package-url'];
 
@@ -47,7 +47,7 @@ class Ithemes_Updater_Information {
 			'download_link' => $package['package-url'],
 
 			'sections' => array(
-				'changelog'    => __( 'These details will be available soon.', 'it-l10n-exchange-addon-2checkout' ),
+				'changelog'    => __( 'These details will be available soon.', 'it-l10n-exchange' ),
 			),
 		);
 

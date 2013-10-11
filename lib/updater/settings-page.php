@@ -68,28 +68,28 @@ class Ithemes_Updater_Settings_Page {
 
 		switch( $code ) {
 			case 'ITXAPI_Updater_Bad_Login':
-				$message = __( 'Incorrect password. Please make sure that you are supplying your iThemes membership username and password details.', 'it-l10n-exchange-addon-2checkout' );
+				$message = __( 'Incorrect password. Please make sure that you are supplying your iThemes membership username and password details.', 'it-l10n-exchange' );
 				break;
 			case 'ITXAPI_Updater_Username_Unknown':
 			case 'ITXAPI_Updater_Username_Invalid':
-				$message = __( 'Invalid username. Please make sure that you are supplying your iThemes membership username and password details.', 'it-l10n-exchange-addon-2checkout' );
+				$message = __( 'Invalid username. Please make sure that you are supplying your iThemes membership username and password details.', 'it-l10n-exchange' );
 				break;
 			case 'ITXAPI_Product_Package_Unknown':
-				$message = sprintf( __( 'The licensing server reports that the %1$s (%2$s) product is unknown. Please contact support for assistance.', 'it-l10n-exchange-addon-2checkout' ), $package_name, $package );
+				$message = sprintf( __( 'The licensing server reports that the %1$s (%2$s) product is unknown. Please contact support for assistance.', 'it-l10n-exchange' ), $package_name, $package );
 				break;
 			case 'ITXAPI_Updater_Too_Many_Sites':
-				$message = sprintf( __( '%1$s could not be licensed since the membership account is out of available licenses for this product. You can unlicense the product on other sites or upgrade your membership to one with a higher number of licenses in order to increase the amount of available licenses.', 'it-l10n-exchange-addon-2checkout' ), $package_name );
+				$message = sprintf( __( '%1$s could not be licensed since the membership account is out of available licenses for this product. You can unlicense the product on other sites or upgrade your membership to one with a higher number of licenses in order to increase the amount of available licenses.', 'it-l10n-exchange' ), $package_name );
 				break;
 			case 'ITXAPI_License_Key_Generate_Failed':
-				$message = sprintf( __( '%s could not be licensed due to an internal error. Please try to license %s again at a later time. If this problem continues, please contact iThemes support.', 'it-l10n-exchange-addon-2checkout' ), $package_name );
+				$message = sprintf( __( '%s could not be licensed due to an internal error. Please try to license %s again at a later time. If this problem continues, please contact iThemes support.', 'it-l10n-exchange' ), $package_name );
 				break;
 		}
 
 		if ( empty( $message ) ) {
-			if ( ! empty( $package ) )
-				$message = sprintf( __( 'An unknown error relating to the %1$s product occurred. Please contact iThemes support. Error details: %2$s', 'it-l10n-exchange-addon-2checkout' ), $package_name, $error->get_error_message() . " ($code)" );
+			if ( !empty( $package ) )
+				$message = sprintf( __( 'An unknown error relating to the %1$s product occurred. Please contact iThemes support. Error details: %2$s', 'it-l10n-exchange' ), $package_name, $error->get_error_message() . " ($code)" );
 			else
-				$message = sprintf( __( 'An unknown error occurred. Please contact iThemes support. Error details: %s', 'it-l10n-exchange-addon-2checkout' ), $error->get_error_message() . " ($code)" );
+				$message = sprintf( __( 'An unknown error occurred. Please contact iThemes support. Error details: %s', 'it-l10n-exchange' ), $error->get_error_message() . " ($code)" );
 		}
 
 		return $message;
@@ -115,22 +115,22 @@ class Ithemes_Updater_Settings_Page {
 
 		$GLOBALS['ithemes-updater-object']->update_options( $settings );
 
-		$this->messages[] = __( 'Settings saved', 'it-l10n-exchange-addon-2checkout' );
+		$this->messages[] = __( 'Settings saved', 'it-l10n-exchange' );
 	}
 
 	private function license_packages( $data ) {
 		check_admin_referer( 'license_packages', 'ithemes_updater_nonce' );
 
 		if ( empty( $data['username'] ) && empty( $data['password'] ) )
-			$this->errors[] = __( 'You must supply an iThemes membership username and password in order to license products.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'You must supply an iThemes membership username and password in order to license products.', 'it-l10n-exchange' );
 		else if ( empty( $data['username'] ) )
-			$this->errors[] = __( 'You must supply an iThemes membership username in order to license products.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'You must supply an iThemes membership username in order to license products.', 'it-l10n-exchange' );
 		else if ( empty( $data['password'] ) )
-			$this->errors[] = __( 'You must supply an iThemes membership password in order to license products.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'You must supply an iThemes membership password in order to license products.', 'it-l10n-exchange' );
 		else if ( empty( $data['packages'] ) )
-			$this->errors[] = __( 'You must select at least one product to license. Ensure that you select the products that you wish to license in the listing below.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'You must select at least one product to license. Ensure that you select the products that you wish to license in the listing below.', 'it-l10n-exchange' );
 
-		if ( ! empty( $this->errors ) )
+		if ( !empty( $this->errors ) )
 			return;
 
 
@@ -143,7 +143,7 @@ class Ithemes_Updater_Settings_Page {
 		}
 
 		if ( empty( $response['packages'] ) ) {
-			$this->errors[] = __( 'An unknown server error occurred. Please try to license your products again at another time.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'An unknown server error occurred. Please try to license your products again at another time.', 'it-l10n-exchange' );
 			return;
 		}
 
@@ -160,26 +160,26 @@ class Ithemes_Updater_Settings_Page {
 
 			$name = Ithemes_Updater_Functions::get_package_name( $package );
 
-			if ( ! empty( $data['key'] ) )
+			if ( !empty( $data['key'] ) )
 				$success[] = $name;
-			else if ( ! empty( $data['status'] ) && ( 'expired' == $data['status'] ) )
-				$warn[$name] = __( 'Your product subscription has expired', 'it-l10n-exchange-addon-2checkout' );
+			else if ( !empty( $data['status'] ) && ( 'expired' == $data['status'] ) )
+				$warn[$name] = __( 'Your product subscription has expired', 'it-l10n-exchange' );
 			else
 				$fail[$name] = $data['error']['message'];
 		}
 
 
-		if ( ! empty( $success ) )
-			$this->messages[] = wp_sprintf( __( 'Successfully licensed %l.', 'it-l10n-exchange-addon-2checkout' ), $success );
+		if ( !empty( $success ) )
+			$this->messages[] = wp_sprintf( __( 'Successfully licensed %l.', 'it-l10n-exchange' ), $success );
 
-		if ( ! empty( $fail ) ) {
+		if ( !empty( $fail ) ) {
 			foreach ( $fail as $name => $reason )
-				$this->errors[] = sprintf( __( 'Unable to license %1$s. Reason: %2$s', 'it-l10n-exchange-addon-2checkout' ), $name, $reason );
+				$this->errors[] = sprintf( __( 'Unable to license %1$s. Reason: %2$s', 'it-l10n-exchange' ), $name, $reason );
 		}
 
-		if ( ! empty( $warn ) ) {
+		if ( !empty( $warn ) ) {
 			foreach ( $warn as $name => $reason )
-				$this->soft_errors[] = sprintf( __( 'Unable to license %1$s. Reason: %2$s', 'it-l10n-exchange-addon-2checkout' ), $name, $reason );
+				$this->soft_errors[] = sprintf( __( 'Unable to license %1$s. Reason: %2$s', 'it-l10n-exchange' ), $name, $reason );
 		}
 	}
 
@@ -187,15 +187,15 @@ class Ithemes_Updater_Settings_Page {
 		check_admin_referer( 'unlicense_packages', 'ithemes_updater_nonce' );
 
 		if ( empty( $data['username'] ) && empty( $data['password'] ) )
-			$this->errors[] = __( 'You must supply an iThemes membership username and password in order to remove licenses.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'You must supply an iThemes membership username and password in order to remove licenses.', 'it-l10n-exchange' );
 		else if ( empty( $data['username'] ) )
-			$this->errors[] = __( 'You must supply an iThemes membership username in order to remove licenses.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'You must supply an iThemes membership username in order to remove licenses.', 'it-l10n-exchange' );
 		else if ( empty( $data['password'] ) )
-			$this->errors[] = __( 'You must supply an iThemes membership password in order to remove licenses.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'You must supply an iThemes membership password in order to remove licenses.', 'it-l10n-exchange' );
 		else if ( empty( $data['packages'] ) )
-			$this->errors[] = __( 'You must select at least one license to remove. Ensure that you select the licenses that you wish to remove in the listing below.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'You must select at least one license to remove. Ensure that you select the licenses that you wish to remove in the listing below.', 'it-l10n-exchange' );
 
-		if ( ! empty( $this->errors ) )
+		if ( !empty( $this->errors ) )
 			return;
 
 
@@ -208,7 +208,7 @@ class Ithemes_Updater_Settings_Page {
 		}
 
 		if ( empty( $response['packages'] ) ) {
-			$this->errors[] = __( 'An unknown server error occurred. Please try to remove licenses from your products again at another time.', 'it-l10n-exchange-addon-2checkout' );
+			$this->errors[] = __( 'An unknown server error occurred. Please try to remove licenses from your products again at another time.', 'it-l10n-exchange' );
 			return;
 		}
 
@@ -229,16 +229,16 @@ class Ithemes_Updater_Settings_Page {
 			else if ( isset( $data['error'] ) && isset( $data['error']['message'] ) )
 				$fail[$name] = $data['error']['message'];
 			else
-				$fail[$name] = __( 'Unknown server error.', 'it-l10n-exchange-addon-2checkout' );
+				$fail[$name] = __( 'Unknown server error.', 'it-l10n-exchange' );
 		}
 
 
-		if ( ! empty( $success ) )
-			$this->messages[] = wp_sprintf( _n( 'Successfully removed license from %l.', 'Successfully removed licenses from %l.', count( $success ), 'it-l10n-exchange-addon-2checkout' ), $success );
+		if ( !empty( $success ) )
+			$this->messages[] = wp_sprintf( _n( 'Successfully removed license from %l.', 'Successfully removed licenses from %l.', count( $success ), 'it-l10n-exchange' ), $success );
 
-		if ( ! empty( $fail ) ) {
+		if ( !empty( $fail ) ) {
 			foreach ( $fail as $name => $reason )
-				$this->errors[] = sprintf( __( 'Unable to remove license from %1$s. Reason: %2$s', 'it-l10n-exchange-addon-2checkout' ), $name, $reason );
+				$this->errors[] = sprintf( __( 'Unable to remove license from %1$s. Reason: %2$s', 'it-l10n-exchange' ), $name, $reason );
 		}
 	}
 
@@ -264,17 +264,17 @@ class Ithemes_Updater_Settings_Page {
 		}
 
 
-		if ( ! empty( $this->messages ) ) {
+		if ( !empty( $this->messages ) ) {
 			foreach ( $this->messages as $message )
 				echo "<div class=\"updated fade\"><p><strong>$message</strong></p></div>\n";
 		}
 
-		if ( ! empty( $this->errors ) ) {
+		if ( !empty( $this->errors ) ) {
 			foreach ( $this->errors as $error )
 				echo "<div class=\"error\"><p><strong>$error</strong></p></div>\n";
 		}
 
-		if ( ! empty( $this->soft_errors ) ) {
+		if ( !empty( $this->soft_errors ) ) {
 			foreach ( $this->soft_errors as $error )
 				echo "<div class=\"error\"><p><strong>$error</strong></p></div>\n";
 		}
@@ -283,7 +283,7 @@ class Ithemes_Updater_Settings_Page {
 ?>
 	<div class="wrap">
 		<?php screen_icon(); ?>
-		<h2><?php _e( 'iThemes Licensing', 'it-l10n-exchange-addon-2checkout' ); ?></h2>
+		<h2><?php _e( 'iThemes Licensing', 'it-l10n-exchange' ); ?></h2>
 
 		<?php $this->list_licensed_products( $licensed, $post_data, $action ); ?>
 
@@ -298,7 +298,7 @@ class Ithemes_Updater_Settings_Page {
 	}
 
 	private function show_settings() {
-		if ( ! is_multisite() || ! is_network_admin() )
+		if ( !is_multisite() || !is_network_admin() )
 			return;
 
 
@@ -309,30 +309,30 @@ class Ithemes_Updater_Settings_Page {
 		<?php wp_nonce_field( 'save_settings', 'ithemes_updater_nonce' ); ?>
 
 		<div id="ithemes-updater-settings">
-			<h3 class="subtitle"><?php _e( 'Settings', 'it-l10n-exchange-addon-2checkout' ); ?></h3>
+			<h3 class="subtitle"><?php _e( 'Settings', 'it-l10n-exchange' ); ?></h3>
 
 			<table class="form-table">
 				<tbody>
 					<tr valign="top">
 						<th scope="row">
-							<label for="show_on_sites"><?php _e( 'Licensing Page Access', 'it-l10n-exchange-addon-2checkout' ); ?></label>
+							<label for="show_on_sites"><?php _e( 'Licensing Page Access', 'it-l10n-exchange' ); ?></label>
 						</th>
 						<td>
 							<?php $checked = ( $show_on_sites ) ? ' checked="checked"' : ''; ?>
 
 							<label>
 								<input id="show_on_sites" type="checkbox" name="show_on_sites" value="1" <?php echo $checked; ?>/>
-								<?php _e( 'Show this licensing page on site dashboards', 'it-l10n-exchange-addon-2checkout' ); ?>
+								<?php _e( 'Show this licensing page on site dashboards', 'it-l10n-exchange' ); ?>
 							</label>
 
-							<p class="description"><?php _e( 'By default, this page only shows on the network dashboard. Enable the option above in order to have this page accessible on sites as well.', 'it-l10n-exchange-addon-2checkout' ); ?></p>
+							<p class="description"><?php _e( 'By default, this page only shows on the network dashboard. Enable the option above in order to have this page accessible on sites as well.', 'it-l10n-exchange' ); ?></p>
 						</td>
 					</tr>
 				</tbody>
 			</table>
 
 			<p class="submit">
-				<input id="save_settings" class="button button-primary" type="submit" value="<?php _e( 'Save Settings', 'it-l10n-exchange-addon-2checkout' ); ?>" />
+				<input id="save_settings" class="button button-primary" type="submit" value="<?php _e( 'Save Settings', 'it-l10n-exchange' ); ?>" />
 				<input type="hidden" name="action" value="save_settings" />
 			</p>
 		</div>
@@ -351,10 +351,10 @@ class Ithemes_Updater_Settings_Page {
 		$time = time();
 
 		$headings = array(
-			__( 'Product', 'it-l10n-exchange-addon-2checkout' ),
-			__( 'Member', 'it-l10n-exchange-addon-2checkout' ),
-			__( 'Expiration', 'it-l10n-exchange-addon-2checkout' ),
-			__( 'Remaining Licenses', 'it-l10n-exchange-addon-2checkout' ),
+			__( 'Product', 'it-l10n-exchange' ),
+			__( 'Member', 'it-l10n-exchange' ),
+			__( 'Expiration', 'it-l10n-exchange' ),
+			__( 'Remaining Licenses', 'it-l10n-exchange' ),
 		);
 
 		if ( ( 'unlicense_packages' != $action ) || empty( $this->errors ) ) {
@@ -370,7 +370,7 @@ class Ithemes_Updater_Settings_Page {
 		<?php wp_nonce_field( 'unlicense_packages', 'ithemes_updater_nonce' ); ?>
 
 		<div class="ithemes-updater-products" id="ithemes-updater-licensed">
-			<h3 class="subtitle"><?php _e( 'Licensed Products', 'it-l10n-exchange-addon-2checkout' ); ?></h3>
+			<h3 class="subtitle"><?php _e( 'Licensed Products', 'it-l10n-exchange' ); ?></h3>
 
 			<table class="ithemes-updater-listing widefat">
 				<thead>
@@ -382,12 +382,12 @@ class Ithemes_Updater_Settings_Page {
 							</label>
 						</th>
 						<th scope="col">
-							<label for="cb-select-all-1"><?php _e( 'Product', 'it-l10n-exchange-addon-2checkout' ); ?></label>
+							<label for="cb-select-all-1"><?php _e( 'Product', 'it-l10n-exchange' ); ?></label>
 						</th>
-						<th scope="col"><?php _e( 'Member', 'it-l10n-exchange-addon-2checkout' ); ?></th>
-						<th scope="col"><?php _e( 'Product Status', 'it-l10n-exchange-addon-2checkout' ); ?></th>
-						<th scope="col"><?php _e( 'Expiration', 'it-l10n-exchange-addon-2checkout' ); ?></th>
-						<th scope="col"><?php _e( 'Remaining Licenses', 'it-l10n-exchange-addon-2checkout' ); ?></th>
+						<th scope="col"><?php _e( 'Member', 'it-l10n-exchange' ); ?></th>
+						<th scope="col"><?php _e( 'Product Status', 'it-l10n-exchange' ); ?></th>
+						<th scope="col"><?php _e( 'Expiration', 'it-l10n-exchange' ); ?></th>
+						<th scope="col"><?php _e( 'Remaining Licenses', 'it-l10n-exchange' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -395,12 +395,12 @@ class Ithemes_Updater_Settings_Page {
 					<?php foreach ( $products as $name => $data ) : ?>
 						<?php
 							if ( -1 == $data['total'] )
-								$remaining = __( 'unlimited', 'it-l10n-exchange-addon-2checkout' );
+								$remaining = __( 'unlimited', 'it-l10n-exchange' );
 							else
 								$remaining = $data['total'] - $data['used'];
 
 //							if ( 0 == $remaining )
-//								$remaining .= ' <a class="button-secondary upgrade">' . __( 'Upgrade', 'it-l10n-exchange-addon-2checkout' ) . '</a>';
+//								$remaining .= ' <a class="button-secondary upgrade">' . __( 'Upgrade', 'it-l10n-exchange' ) . '</a>';
 
 
 							$expiration = $this->get_expiration_string( $data['expiration'] );
@@ -452,7 +452,7 @@ class Ithemes_Updater_Settings_Page {
 						<td colspan="6">
 							<input type="text" name="it-updater-username" placeholder="iThemes Username" value="<?php echo esc_attr( $post_data['username'] ); ?>" autocomplete="off" />
 							<input type="password" name="it-updater-password" placeholder="Password" value="<?php echo esc_attr( $post_data['password'] ); ?>" />
-							<input class="button-primary" type="submit" name="submit" value="<?php _e( 'Remove Licenses', 'it-l10n-exchange-addon-2checkout' ); ?>" />
+							<input class="button-primary" type="submit" name="submit" value="<?php _e( 'Remove Licenses', 'it-l10n-exchange' ); ?>" />
 							<input type="hidden" name="action" value="unlicense_packages" />
 						</td>
 					</tr>
@@ -486,11 +486,11 @@ class Ithemes_Updater_Settings_Page {
 		<?php wp_nonce_field( 'license_packages', 'ithemes_updater_nonce' ); ?>
 
 		<div class="ithemes-updater-products" id="ithemes-updater-unlicensed">
-			<h3 class="subtitle"><?php _e( 'Unlicensed Products', 'it-l10n-exchange-addon-2checkout' ); ?></h3>
+			<h3 class="subtitle"><?php _e( 'Unlicensed Products', 'it-l10n-exchange' ); ?></h3>
 
-			<p><?php _e( 'The following products have not been licensed. Licensing a product gives you access to automatic updates from within WordPress.', 'it-l10n-exchange-addon-2checkout' ); ?></p>
-			<p><?php _e( 'To license products, select the products you wish to license, enter your iThemes membership username and password, and press the License Products button.', 'it-l10n-exchange-addon-2checkout' ); ?></p>
-			<p><?php printf( __( 'Need help? <a href="%s">Click here for a quick video tutorial</a>.', 'it-l10n-exchange-addon-2checkout' ), 'http://ithemes.com/2013/04/11/introducing-the-new-and-improved-ithemes-licensing-system/' ); ?></p>
+			<p><?php _e( 'The following products have not been licensed. Licensing a product gives you access to automatic updates from within WordPress.', 'it-l10n-exchange' ); ?></p>
+			<p><?php _e( 'To license products, select the products you wish to license, enter your iThemes membership username and password, and press the License Products button.', 'it-l10n-exchange' ); ?></p>
+			<p><?php printf( __( 'Need help? <a href="%s">Click here for a quick video tutorial</a>.', 'it-l10n-exchange' ), 'http://ithemes.com/2013/04/11/introducing-the-new-and-improved-ithemes-licensing-system/' ); ?></p>
 
 			<table class="ithemes-updater-listing widefat">
 				<thead>
@@ -502,7 +502,7 @@ class Ithemes_Updater_Settings_Page {
 							</label>
 						</th>
 						<th scope="col">
-							<label for="cb-select-all-2"><?php _e( 'Product', 'it-l10n-exchange-addon-2checkout' ); ?></label>
+							<label for="cb-select-all-2"><?php _e( 'Product', 'it-l10n-exchange' ); ?></label>
 						</th>
 					</tr>
 				</thead>
@@ -535,7 +535,7 @@ class Ithemes_Updater_Settings_Page {
 						<td colspan="2">
 							<input type="text" name="it-updater-username" placeholder="iThemes Username" value="<?php echo esc_attr( $post_data['username'] ); ?>" autocomplete="off" />
 							<input type="password" name="it-updater-password" placeholder="Password" value="<?php echo esc_attr( $post_data['password'] ); ?>" />
-							<input class="button-primary" type="submit" name="submit" value="<?php _e( 'License Products', 'it-l10n-exchange-addon-2checkout' ); ?>" />
+							<input class="button-primary" type="submit" name="submit" value="<?php _e( 'License Products', 'it-l10n-exchange' ); ?>" />
 							<input type="hidden" name="action" value="license_packages" />
 						</td>
 					</tr>
@@ -555,28 +555,28 @@ class Ithemes_Updater_Settings_Page {
 
 ?>
 	<div class="ithemes-updater-products" id="ithemes-updater-unrecognized">
-		<h3 class="subtitle"><?php _e( 'Unrecognized Products', 'it-l10n-exchange-addon-2checkout' ); ?></h3>
+		<h3 class="subtitle"><?php _e( 'Unrecognized Products', 'it-l10n-exchange' ); ?></h3>
 
-		<p><?php _e( 'The following products were not recognized by the licensing system. This can be due to a bug in the product code, a temporary server issue, or because the product is no longer supported.', 'it-l10n-exchange-addon-2checkout' ); ?></p>
-		<p><?php printf( __( 'Please check this page again at a later time to see if the problem resolves itself. If the product remains, please contact <a href="%s">iThemes support</a> and provide them with the details given below.', 'it-l10n-exchange-addon-2checkout' ), 'http://ithemes.com/forum/' ); ?></p>
+		<p><?php _e( 'The following products were not recognized by the licensing system. This can be due to a bug in the product code, a temporary server issue, or because the product is no longer supported.', 'it-l10n-exchange' ); ?></p>
+		<p><?php printf( __( 'Please check this page again at a later time to see if the problem resolves itself. If the product remains, please contact <a href="%s">iThemes support</a> and provide them with the details given below.', 'it-l10n-exchange' ), 'http://ithemes.com/forum/' ); ?></p>
 
 		<table class="ithemes-updater-listing widefat">
 			<thead>
 				<tr>
-					<th scope="col"><?php _e( 'Product', 'it-l10n-exchange-addon-2checkout' ); ?></th>
-					<th scope="col"><?php _e( 'Type', 'it-l10n-exchange-addon-2checkout' ); ?></th>
-					<th scope="col"><?php _e( 'Package', 'it-l10n-exchange-addon-2checkout' ); ?></th>
-					<th scope="col"><?php _e( 'Version', 'it-l10n-exchange-addon-2checkout' ); ?></th>
-					<th scope="col"><?php _e( 'Server Response', 'it-l10n-exchange-addon-2checkout' ); ?></th>
+					<th scope="col"><?php _e( 'Product', 'it-l10n-exchange' ); ?></th>
+					<th scope="col"><?php _e( 'Type', 'it-l10n-exchange' ); ?></th>
+					<th scope="col"><?php _e( 'Package', 'it-l10n-exchange' ); ?></th>
+					<th scope="col"><?php _e( 'Version', 'it-l10n-exchange' ); ?></th>
+					<th scope="col"><?php _e( 'Server Response', 'it-l10n-exchange' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php foreach ( $products as $name => $data ) : ?>
 					<?php
-						if ( ( 'error' == $data['status'] ) && ( ! empty( $data['error']['message'] ) ) )
+						if ( ( 'error' == $data['status'] ) && ( !empty( $data['error']['message'] ) ) )
 							$response = "{$data['error']['message']} ({$data['error']['code']})";
 						else
-							$response = __( 'Unknown Error', 'it-l10n-exchange-addon-2checkout' );
+							$response = __( 'Unknown Error', 'it-l10n-exchange' );
 					?>
 					<tr>
 						<td><?php echo $name; ?></td>
@@ -609,16 +609,16 @@ class Ithemes_Updater_Settings_Page {
 			$expiration = date( 'Y-m-d', $expiration_timestamp );
 		else {
 			if ( $time_left > 86400 )
-				$expiration = sprintf( _n( '%d day', '%d days', intval( $time_left / 86400 ), 'it-l10n-exchange-addon-2checkout' ), intval( $time_left / 86400 ) );
+				$expiration = sprintf( _n( '%d day', '%d days', intval( $time_left / 86400 ), 'it-l10n-exchange' ), intval( $time_left / 86400 ) );
 			else if ( $time_left > 3600 )
-				$expiration = sprintf( _n( '%d hour', '%d hours', intval( $time_left / 3600 ), 'it-l10n-exchange-addon-2checkout' ), intval( $time_left / 3600 ) );
+				$expiration = sprintf( _n( '%d hour', '%d hours', intval( $time_left / 3600 ), 'it-l10n-exchange' ), intval( $time_left / 3600 ) );
 			else if ( $time_left > 60 )
-				$expiration = sprintf( _n( '%d minute', '%d minutes', intval( $time_left / 60 ), 'it-l10n-exchange-addon-2checkout' ), intval( $time_left / 60 ) );
+				$expiration = sprintf( _n( '%d minute', '%d minutes', intval( $time_left / 60 ), 'it-l10n-exchange' ), intval( $time_left / 60 ) );
 			else
-				$expiration = sprintf( _n( '%d second', '%d seconds', $time_left, 'it-l10n-exchange-addon-2checkout' ), intval( $time_left / 60 ) );
+				$expiration = sprintf( _n( '%d second', '%d seconds', $time_left, 'it-l10n-exchange' ), intval( $time_left / 60 ) );
 
 			if ( $expired )
-				$expiration = sprintf( __( '%s ago', 'it-l10n-exchange-addon-2checkout' ), $expiration );
+				$expiration = sprintf( __( '%s ago', 'it-l10n-exchange' ), $expiration );
 		}
 
 		return $expiration;

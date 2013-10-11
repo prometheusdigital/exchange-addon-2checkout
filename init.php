@@ -30,6 +30,11 @@ include( 'lib/addon-settings.php' );
 include( 'lib/addon-functions.php' );
 
 /**
+ * Webhooks
+*/
+// include( 'lib/addon-webhooks.php' );
+
+/**
  * The following file contains the 2Checkout PHP Library
  *
  * @link https://github.com/2Checkout/2checkout-php

@@ -8,15 +8,15 @@
 */
 
 /**
- * This is the function registered in the options array when it_exchange_register_addon was called for 2checkout
+ * This is the function registered in the options array when it_exchange_register_addon was called for 2Checkout
  *
  * It tells Exchange where to find the settings page
  *
  * @return void
 */
 function it_exchange_2checkout_addon_settings_callback() {
-    $IT_Exchange_2checkout_Add_On = new IT_Exchange_2checkout_Add_On();
-    $IT_Exchange_2checkout_Add_On->print_settings_page();
+    $IT_Exchange_2Checkout_Add_On = new IT_Exchange_2Checkout_Add_On();
+    $IT_Exchange_2Checkout_Add_On->print_settings_page();
 }
 
 /**
@@ -33,7 +33,7 @@ function it_exchange_2checkout_addon_settings_callback() {
  * @return void
 */
 function it_exchange_print_2checkout_wizard_settings( $form ) {
-    $IT_Exchange_2checkout_Add_On = new IT_Exchange_2checkout_Add_On();
+    $IT_Exchange_2Checkout_Add_On = new IT_Exchange_2Checkout_Add_On();
     $settings = it_exchange_get_option( 'addon_2checkout', true );
     $form_values = ITUtility::merge_defaults( ITForm::get_post_data(), $settings );
     $hide_if_js =  it_exchange_is_addon_enabled( '2checkout' ) ? '' : 'hide-if-js';
@@ -42,30 +42,30 @@ function it_exchange_print_2checkout_wizard_settings( $form ) {
     <?php if ( empty( $hide_if_js ) ) { ?>
         <input class="enable-2checkout" type="hidden" name="it-exchange-transaction-methods[]" value="2checkout" />
     <?php } ?>
-    <?php $IT_Exchange_2checkout_Add_On->get_2checkout_payment_form_table( $form, $form_values ); ?>
+    <?php $IT_Exchange_2Checkout_Add_On->get_form_table( $form, $form_values ); ?>
     </div>
     <?php
 }
 add_action( 'it_exchange_print_2checkout_wizard_settings', 'it_exchange_print_2checkout_wizard_settings' );
 
 /**
- * Saves 2checkout settings when the Wizard is saved
+ * Saves 2Checkout settings when the Wizard is saved
  *
  * @since 1.0.0
  *
  * @return void
 */
 function it_exchange_save_2checkout_wizard_settings( $errors ) {
-    if ( ! empty( $errors ) )
+    if ( !empty( $errors ) )
         return $errors;
 
-    $IT_Exchange_2checkout_Add_On = new IT_Exchange_2checkout_Add_On();
-    return $IT_Exchange_2checkout_Add_On->twocheckout_save_wizard_settings();
+    $IT_Exchange_2Checkout_Add_On = new IT_Exchange_2Checkout_Add_On();
+    return $IT_Exchange_2Checkout_Add_On->save_wizard_settings();
 }
 // add_action( 'it_exchange_save_2checkout_wizard_settings', 'it_exchange_save_2checkout_wizard_settings' );
 
 /**
- * Default settings for 2checkout
+ * Default settings for 2Checkout
  *
  * @since 1.0.0
  *
@@ -74,13 +74,16 @@ function it_exchange_save_2checkout_wizard_settings( $errors ) {
 */
 function it_exchange_2checkout_addon_default_settings( $values ) {
     $defaults = array(
-        '2checkout-test-mode'             => false,
-        '2checkout-sid'                   => '',
-        '2checkout-secret'                => '',
-        '2checkout-language'              => 'en',
-        '2checkout-purchase-button-label' => __( 'Purchase', 'it-l10n-exchange-addon-2checkout' ),
+        '2checkout_sid'                    => '',
+        '2checkout_secret'                 => '',
+        '2checkout_checkout_type'          => 'purchase',
+		'2checkout_default_payment_method' => 'CC',
+        '2checkout_sandbox_mode'           => false,
+        '2checkout_purchase_button_label'  => __( 'Purchase', 'LION' ),
     );
+
     $values = ITUtility::merge_defaults( $values, $defaults );
+
     return $values;
 }
 add_filter( 'it_storage_get_defaults_exchange_addon_2checkout', 'it_exchange_2checkout_addon_default_settings' );
@@ -89,7 +92,7 @@ add_filter( 'it_storage_get_defaults_exchange_addon_2checkout', 'it_exchange_2ch
  * Class for 2Checkout
  * @since 1.0.0
 */
-class IT_Exchange_2checkout_Add_On {
+class IT_Exchange_2Checkout_Add_On {
 
     /**
      * @var boolean $_is_admin true or false
@@ -131,7 +134,7 @@ class IT_Exchange_2checkout_Add_On {
         $this->_current_page   = empty( $_GET['page'] ) ? false : $_GET['page'];
         $this->_current_add_on = empty( $_GET['add-on-settings'] ) ? false : $_GET['add-on-settings'];
 
-        if ( ! empty( $_POST ) && $this->_is_admin && 'it-exchange-addons' == $this->_current_page && '2checkout' == $this->_current_add_on ) {
+        if ( !empty( $_POST ) && $this->_is_admin && 'it-exchange-addons' == $this->_current_page && '2checkout' == $this->_current_add_on ) {
             add_action( 'it_exchange_save_add_on_settings_2checkout', array( $this, 'save_settings' ) );
             do_action( 'it_exchange_save_add_on_settings_2checkout' );
         }
@@ -152,24 +155,24 @@ class IT_Exchange_2checkout_Add_On {
         );
         $form         = new ITForm( $form_values, array( 'prefix' => 'it-exchange-add-on-2checkout' ) );
 
-        if ( ! empty ( $this->status_message ) )
+        if ( !empty ( $this->status_message ) )
             ITUtility::show_status_message( $this->status_message );
-        if ( ! empty( $this->error_message ) )
+        if ( !empty( $this->error_message ) )
             ITUtility::show_error_message( $this->error_message );
 
         ?>
         <div class="wrap">
             <?php screen_icon( 'it-exchange' ); ?>
-            <h2><?php _e( '2Checkout Settings', 'it-l10n-exchange-addon-2checkout' ); ?></h2>
+            <h2><?php _e( '2Checkout Settings', 'LION' ); ?></h2>
 
-            <?php do_action( 'it_exchange_2checkout_settings_page_top' ); ?>
+            <?php do_action( 'it_exchange_paypa-pro_settings_page_top' ); ?>
             <?php do_action( 'it_exchange_addon_settings_page_top' ); ?>
             <?php $form->start_form( $form_options, 'it-exchange-2checkout-settings' ); ?>
                 <?php do_action( 'it_exchange_2checkout_settings_form_top' ); ?>
-                <?php $this->get_2checkout_payment_form_table( $form, $form_values ); ?>
+                <?php $this->get_form_table( $form, $form_values ); ?>
                 <?php do_action( 'it_exchange_2checkout_settings_form_bottom' ); ?>
                 <p class="submit">
-                    <?php $form->add_submit( 'submit', array( 'value' => __( 'Save Changes', 'it-l10n-exchange-addon-2checkout' ), 'class' => 'button button-primary button-large' ) ); ?>
+                    <?php $form->add_submit( 'submit', array( 'value' => __( 'Save Changes', 'LION' ), 'class' => 'button button-primary button-large' ) ); ?>
                 </p>
             <?php $form->end_form(); ?>
             <?php do_action( 'it_exchange_2checkout_settings_page_bottom' ); ?>
@@ -183,53 +186,66 @@ class IT_Exchange_2checkout_Add_On {
      *
      * @since 1.0.0
      */
-    function get_2checkout_payment_form_table( $form, $settings = array() ) {
+    function get_form_table( $form, $settings = array() ) {
 
-        $general_settings = it_exchange_get_option( 'settings_general' );
-
-        if ( !empty( $settings ) )
-            foreach ( $settings as $key => $var )
+        if ( !empty( $settings ) ) {
+            foreach ( $settings as $key => $var ) {
                 $form->set_option( $key, $var );
+			}
+		}
 
-        if ( ! empty( $_GET['page'] ) && 'it-exchange-setup' == $_GET['page'] ) : ?>
-            <h3><?php _e( '2Checkout', 'it-l10n-exchange-addon-2checkout' ); ?></h3>
+        if ( !empty( $_GET['page'] ) && 'it-exchange-setup' == $_GET['page'] ) : ?>
+            <h3><?php _e( '2Checkout', 'LION' ); ?></h3>
         <?php endif; ?>
         <div class="it-exchange-addon-settings it-exchange-2checkout-addon-settings">
             <p>
-                <?php _e( 'To get 2Checkout set up for use with Exchange, you\'ll need to add the following information from your 2Checkout account.', 'it-l10n-exchange-addon-2checkout' ); ?>
+                <?php _e( 'To get 2Checkout set up for use with Exchange, you\'ll need to add the following information from your 2Checkout account.', 'LION' ); ?>
             </p>
             <p>
-                <?php _e( 'Don\'t have a 2Checkout account yet?', 'it-l10n-exchange-addon-2checkout' ); ?> <a href="http://2checkout.com" target="_blank"><?php _e( 'Go set one up here', 'it-l10n-exchange-addon-2checkout' ); ?></a>.
+                <?php _e( 'Don\'t have a 2Checkout account yet?', 'LION' ); ?> <a href="https://www.2checkout.com/signup" target="_blank"><?php _e( 'Go set one up here', 'LION' ); ?></a>.
             </p>
-            <h4><?php _e( 'Fill out your 2Checkout API Credentials', 'it-l10n-exchange-addon-2checkout' ); ?></h4>
+            <h4><?php _e( 'Fill out your 2Checkout API Credentials', 'LION' ); ?></h4>
             <p>
-                <label for="2checkout-sid"><?php _e( '2Checkout Account Number (SID)', 'it-l10n-exchange-addon-2checkout' ); ?> <span class="tip" title="<?php _e( 'Your 2Checkout Account Number, or SID, is found in the top-right corner of your 2CO account dashboard.', 'it-l10n-exchange-addon-2checkout' ); ?>">i</span></label>
-                <?php $form->add_text_box( '2checkout-sid' ); ?>
+                <label for="2checkout_sid"><?php _e( '2Checkout SID', 'LION' ); ?> <span class="tip" title="<?php _e( 'Your 2Checkout Account Number, or SID, is found in the top-right corner of your 2CO account dashboard.', 'LION' ); ?>">i</span></label>
+                <?php $form->add_text_box( '2checkout_sid' ); ?>
             </p>
             <p>
-                <label for="2checkout-secret"><?php _e( '2Checkout Secret Word', 'it-l10n-exchange-addon-2checkout' ); ?> <span class="tip" title="<?php _e( 'The 2Checkout API Password is found in...', 'it-l10n-exchange-addon-2checkout' ); ?>">i</span></label>
-                <?php $form->add_password( '2checkout-secret' ); ?>
+                <label for="2checkout_secret"><?php _e( 'Secret Word', 'LION' ); ?> <span class="tip" title="<?php _e( 'The 2Checkout Secret Word can be found and customized under the Site Management area of your 2CO account dashboard.', 'LION' ); ?>">i</span></label>
+                <?php $form->add_password( '2checkout_secret' ); ?>
+            </p>
+            <p>
+                <label for="2checkout_checkout_type"><?php _e( 'Checkout Type', 'LION' ); ?> <span class="tip" title="<?php _e( 'This will change the checkout style used for 2Checkout purchases.', 'LION' ); ?>">i</span></label>
+				<?php
+					$checkout_types = array(
+						'purchase' => __( 'Standard Checkout (purchase)', 'LION' ),
+						'spurchase' => __( 'Single Page Checkout (spurchase)', 'LION' )
+					);
+
+					$form->add_drop_down( '2checkout_checkout_type', $checkout_types );
+				?>
+            </p>
+            <p>
+                <label for="2checkout_default_payment_method"><?php _e( 'Default Payment Method', 'LION' ); ?> <span class="tip" title="<?php _e( 'This will change the default payment method selected when the customer goes to the checkout page.', 'LION' ); ?>">i</span></label>
+				<?php
+					$payment_methods = array(
+						'CC' => __( 'Credit Card - Preselect the Credit Card payment method', 'LION' ),
+						'PPI' => __( 'PayPal - Preselect the PayPal payment method', 'LION' )
+					);
+
+					$form->add_drop_down( '2checkout_default_payment_method', $payment_methods );
+				?>
             </p>
 
-            <h4><?php _e( 'Optional: Set Default Language for 2Checkout Pages', 'it-l10n-exchange-addon-2checkout' ); ?></h4>
-            <p>
-                <label for="2checkout-language"><?php _e( '2Checkout Language', 'it-l10n-exchange-addon-2checkout' ); ?> <span class="tip" title="<?php _e( 'Select the language that 2Checkout should use on their checkout page.', 'it-l10n-exchange-addon-2checkout' ); ?>">i</span></label>
-                <?php
-                    $languages = array('en'=>'English', 'es_ib'=>'Spanish (European) — Español', 'es_la'=>'Spanish (Latin) — Español', 'fr'=>'French — Français', 'ja'=>'Japanese — 日本語', 'de'=>'German — Deutsch', 'it'=>'Italian — Italiano', 'nl'=>'Dutch — Nederlands', 'pt'=>'Portuguese — Português', 'el'=>'Greek — Ελληνική', 'sv'=>'Swedish — Svenska', 'zh'=>'Chinese (Traditional) — 語言名稱', 'sl'=>'Slovenian — Slovene', 'da'=>'Danish — Dansk', 'no'=>'Norwegian — Norsk');
-                    $form->add_drop_down( '2checkout-language', $languages );
-                ?>
-            </p>
-
-            <h4><?php _e( 'Optional: Edit Purchase Button Label', 'it-l10n-exchange-addon-2checkout' ); ?></h4>
-            <p>
-                <label for="2checkout-purchase-button-label"><?php _e( 'Purchase Button Label', 'it-l10n-exchange-addon-2checkout' ); ?> <span class="tip" title="<?php _e( 'This is the text inside the button your customers will press to purchase with 2Checkout', 'it-l10n-exchange-addon-2checkout' ); ?>">i</span></label>
-                <?php $form->add_text_box( '2checkout-purchase-button-label' ); ?>
-            </p>
-
-            <h4 class="hide-if-wizard"><?php _e( 'Optional: Enable 2Checkout Test Mode', 'it-l10n-exchange-addon-2checkout' ); ?></h4>
+            <h4 class="hide-if-wizard"><?php _e( 'Optional: Enable 2Checkout Demo Mode', 'LION' ); ?></h4>
             <p class="hide-if-wizard">
-                <?php $form->add_check_box( '2checkout-test-mode', array( 'class' => 'show-test-mode-options' ) ); ?>
-                <label for="2checkout-test-mode"><?php _e( 'Enable 2Checkout Test Mode?', 'it-l10n-exchange-addon-2checkout' ); ?> <span class="tip" title="<?php _e( 'Use this mode for testing your store. This mode will need to be disabled when the store is ready to process customer payments.', 'it-l10n-exchange-addon-2checkout' ); ?>">i</span></label>
+                <?php $form->add_check_box( '2checkout_sandbox_mode', array( 'class' => 'show-test-mode-options' ) ); ?>
+                <label for="2checkout_sandbox_mode"><?php _e( 'Enable 2Checkout Demo Mode?', 'LION' ); ?> <span class="tip" title="<?php _e( 'Use this mode for testing your store. This mode will need to be disabled when the store is ready to process customer payments.', 'LION' ); ?>">i</span></label>
+            </p>
+
+            <h4><?php _e( 'Optional: Edit Purchase Button Label', 'LION' ); ?></h4>
+            <p>
+                <label for="2checkout_purchase_button_label"><?php _e( 'Purchase Button Label', 'LION' ); ?> <span class="tip" title="<?php _e( 'This is the text inside the button your customers will press to purchase with 2Checkout', 'LION' ); ?>">i</span></label>
+                <?php $form->add_text_box( '2checkout_purchase_button_label' ); ?>
             </p>
         </div>
         <?php
@@ -246,36 +262,43 @@ class IT_Exchange_2checkout_Add_On {
         $new_values = wp_parse_args( ITForm::get_post_data(), $defaults );
 
         // Check nonce
-        if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'it-exchange-2checkout-settings' ) ) {
-            $this->error_message = __( 'Error. Please try again', 'it-l10n-exchange-addon-2checkout' );
+        if ( !wp_verify_nonce( $_POST['_wpnonce'], 'it-exchange-2checkout-settings' ) ) {
+            $this->error_message = __( 'Error. Please try again', 'LION' );
             return;
         }
 
         $errors = apply_filters( 'it_exchange_add_on_2checkout_validate_settings', $this->get_form_errors( $new_values ), $new_values );
-        if ( ! $errors && it_exchange_save_option( 'addon_2checkout', $new_values ) ) {
-            ITUtility::show_status_message( __( 'Settings saved.', 'it-l10n-exchange-addon-2checkout' ) );
+        if ( !$errors && it_exchange_save_option( 'addon_2checkout', $new_values ) ) {
+            ITUtility::show_status_message( __( 'Settings saved.', 'LION' ) );
         } else if ( $errors ) {
             $errors = implode( '<br />', $errors );
             $this->error_message = $errors;
         } else {
-            $this->status_message = __( 'Settings not saved.', 'it-l10n-exchange-addon-2checkout' );
+            $this->status_message = __( 'Settings not saved.', 'LION' );
         }
     }
 
-    function twocheckout_save_wizard_settings() {
+    /**
+     * Save wizard settings
+     *
+     * @since 1.0.0
+     * @return void|array Void or Error message array
+    */
+    function save_wizard_settings() {
         if ( empty( $_REQUEST['it_exchange_settings-wizard-submitted'] ) )
             return;
 
-        $twocheckout_settings = array();
+		$defaults = it_exchange_cybersource_addon_default_settings( array() );
+
+        $twocheckout_settings = array(
+			'2checkout_checkout_type' => $defaults[ '2checkout_checkout_type' ],
+			'2checkout_default_payment_method' => $defaults[ '2checkout_default_payment_method' ],
+			'2checkout_purchase_button_label' => $defaults[ '2checkout_purchase_button_label' ]
+		);
 
         // Fields to save
-        $fields = array(
-            '2checkout-sid',
-            '2checkout-secret',
-            '2checkout-language',
-            '2checkout-test-mode',
-            '2checkout-purchase-button-label',
-        );
+        $fields = array_keys( $defaults );
+
         $default_wizard_2checkout_settings = apply_filters( 'default_wizard_2checkout_settings', $fields );
 
         foreach( $default_wizard_2checkout_settings as $var ) {
@@ -292,7 +315,7 @@ class IT_Exchange_2checkout_Add_On {
 
         } else {
             it_exchange_save_option( 'addon_2checkout', $settings );
-            $this->status_message = __( 'Settings Saved.', 'it-l10n-exchange-addon-2checkout' );
+            $this->status_message = __( 'Settings Saved.', 'LION' );
         }
 
         return;
@@ -304,17 +327,20 @@ class IT_Exchange_2checkout_Add_On {
      * Returns string of errors if anything is invalid
      *
      * @since 1.0.0
-     * @return void
+     * @return array
     */
     public function get_form_errors( $values ) {
 
         $errors = array();
-        if ( empty( $values['2checkout-sid'] ) )
-            $errors[] = __( 'Please include your 2Checkout Account ID (SID)', 'it-l10n-exchange-addon-2checkout' );
-        if ( empty( $values['2checkout-secret'] ) )
-            $errors[] = __( 'Please include your 2Checkout Secret Word', 'it-l10n-exchange-addon-2checkout' );
+
+		if ( empty( $values['2checkout_sid'] ) )
+            $errors[] = __( 'Please include your 2Checkout SID', 'LION' );
+
+        if ( empty( $values['2checkout_secret'] ) )
+            $errors[] = __( 'Please include your 2Checkout Secret Word', 'LION' );
 
         return $errors;
+
     }
 
 }

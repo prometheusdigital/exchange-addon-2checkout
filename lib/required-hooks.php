@@ -24,7 +24,7 @@ function it_exchange_refund_url_for_2checkout( $url ) {
 add_filter( 'it_exchange_refund_url_for_2checkout', 'it_exchange_refund_url_for_2checkout' );
 
 /**
- * This proccesses a 2checkout transaction.
+ * This proccesses a 2Checkout transaction.
  *
  * The it_exchange_do_transaction_[addon-slug] action is called when
  * the site visitor clicks a specific add-ons 'purchase' button. It is
@@ -42,52 +42,82 @@ add_filter( 'it_exchange_refund_url_for_2checkout', 'it_exchange_refund_url_for_
 function it_exchange_2checkout_addon_process_transaction( $status, $transaction_object ) {
 
 	// If this has been modified as true already, return.
-	if ( $status )
+	if ( $status ) {
 		return $status;
-
-	// Verify nonce
-	if ( ! empty( $_REQUEST['_2checkout_nonce'] ) && ! wp_verify_nonce( $_REQUEST['_2checkout_nonce'], '2checkout-checkout' ) ) {
-		it_exchange_add_message( 'error', __( 'Transaction Failed, unable to verify security token.', 'it-l10n-exchange-addon-2checkout' ) );
-		return false;
 	}
 
-	// Make sure we have the correct $_POST argument
-	if ( ! empty( $_POST['2checkoutToken'] ) ) {
+	$payment_id = 0;
+
+	if ( !empty( $_REQUEST[ 'it-exchange-transaction-method' ] ) && '2checkout' === $_REQUEST[ 'it-exchange-transaction-method' ] ) {
+		$it_exchange_customer = it_exchange_get_current_customer();
 
 		try {
+			// Check for return to thank you page or 2Checkout INS-response
+			if ( isset( $_REQUEST[ 'credit_card_processed' ] ) || isset( $_REQUEST[ 'message_type' ] ) ) {
+				$settings = it_exchange_get_option( 'addon_2checkout' );
 
-			$general_settings = it_exchange_get_option( 'settings_general' );
-			$settings         = it_exchange_get_option( 'addon_2checkout' );
+				$twocheckout_sid = $settings[ '2checkout_sid' ];
+				$twocheckout_secret = $settings[ '2checkout_secret' ];
 
-			// Get our secret key
-			// $secret_key = ( $settings['2checkout-test-mode'] ) ? $settings['2checkout-test-secret-key'] : $settings['2checkout-live-secret-key'];
+				// 2Checkout Receipt Return URL
+				if ( isset( $_REQUEST[ 'merchant_order_id' ] ) ) {
+					$payment_id = $_REQUEST[ 'merchant_order_id' ];
+					$invoice_id = $_REQUEST[ 'order_number' ];
+					$total = $_REQUEST[ 'total' ];
 
-			// Set 2checkout customer from WP customer ID
-			// $it_exchange_customer = it_exchange_get_current_customer();
-			// if ( $twocheckout_id = it_exchange_2checkout_addon_get_2checkout_customer_id( $it_exchange_customer->id ) )
-			// 	$twocheckout_customer = 2Checkout_Customer::retrieve( $twocheckout_id );
+					$twocheckout_md5 = strtoupper( $_REQUEST[ 'key' ] );
 
-			// Now that we have a valid Customer ID, charge them!
-			$charge = array(
-				'customer'    => $twocheckout_customer->id,
-				'amount'      => number_format( $transaction_object->total, 2, '', '' ),
-				'currency'    => $general_settings['default-currency'],
-				'description' => $transaction_object->description,
-			);
+					if ( $settings[ '2checkout_sandbox_mode' ] ) {
+						$check_key = $twocheckout_secret . $twocheckout_sid . '1' . $total;
+					}
+					else {
+						$check_key = $twocheckout_secret . $twocheckout_sid . $invoice_id . $total;
+					}
 
+					$check_key = strtoupper( md5( $check_key ) );
+				}
+				// 2Checkout IPN Notifications
+				elseif ( isset( $_REQUEST[ 'vendor_order_id' ] ) ) {
+					$payment_id = $_REQUEST[ 'sale_id' ];
+					$invoice_id = $_REQUEST[ 'invoice_id' ];
+
+					// $vendor_order_id = $_REQUEST[ 'vendor_order_id' ];
+					// $vendor_id = $_REQUEST[ 'vendor_id' ];
+
+					$twocheckout_md5 = strtoupper( $_REQUEST[ 'md5_hash' ] );
+
+					$check_key = $payment_id . $twocheckout_sid . $invoice_id . $twocheckout_secret;
+					$check_key = strtoupper( md5( $check_key ) );
+				}
+				else {
+					throw new Exception( __( 'Invalid request', 'LION' ) );
+				}
+
+				if ( $check_key != $twocheckout_md5 ) {
+					throw new Exception( __( 'Invalid request', 'LION' ) );
+				}
+			}
 		}
 		catch ( Exception $e ) {
+			it_exchange_flag_purchase_dialog_error( '2checkout' );
 			it_exchange_add_message( 'error', $e->getMessage() );
+
 			return false;
 		}
-		return it_exchange_add_transaction( '2checkout', $charge->id, 'succeeded', $it_exchange_customer->id, $transaction_object );
-	} else {
-		it_exchange_add_message( 'error', __( 'Unknown error. Please try again later.', 'it-l10n-exchange-addon-2checkout' ) );
+
+		return it_exchange_add_transaction( '2checkout', $payment_id, 'succeeded', $it_exchange_customer->id, $transaction_object );
 	}
+
 	return false;
 
 }
-add_action( 'it_exchange_do_transaction_2checkout', 'it_exchange_2checkout_addon_process_transaction', 10, 2 );
+add_filter( 'it_exchange_do_transaction_2checkout', 'it_exchange_2checkout_addon_process_transaction', 10, 2 );
+
+function it_exchange_2checkout_get_transaction_confirmation_url( $url, $transaction_id ) {
+	it_exchange_recurring_payments_addon_update_transaction_subscription_id( it_exchange_get_transaction( get_post( $transaction_id ) ), get_post_meta( $transaction_id, '_it_exchange_transaction_method_id', true ) );
+
+	return $url;
+}
 
 /**
  * Returns the button for making the payment
@@ -100,57 +130,33 @@ add_action( 'it_exchange_do_transaction_2checkout', 'it_exchange_2checkout_addon
  *
  * @since 1.0.0
  *
+ * @param string $button
  * @param array $options
  * @return string HTML button
 */
-function it_exchange_2checkout_addon_make_payment_button( $options ) {
+function it_exchange_2checkout_addon_make_payment_button( $button, $options ) {
 
     if ( 0 >= it_exchange_get_cart_total( false ) )
-        return;
+        return $button;
 
-    $general_settings = it_exchange_get_option( 'settings_general' );
-    $twocheckout_settings = it_exchange_get_option( 'addon_2checkout' );
+	try {
+		// Get Checkout Button
+		$button = it_exchange_2checkout_addon_checkout_button( $options );
+	}
+	catch ( Exception $e ) {
+		it_exchange_flag_purchase_dialog_error( '2checkout' );
+		it_exchange_add_message( 'error', $e->getMessage() );
 
-    $publishable_key = ( $twocheckout_settings['2checkout-test-mode'] ) ? $twocheckout_settings['2checkout-test-publishable-key'] : $twocheckout_settings['2checkout-live-publishable-key'];
+		return '';
+	}
 
-    $products = it_exchange_get_cart_data( 'products' );
+	return $button;
 
-    $payment_form = '<form class="2checkout_form" action="' . esc_attr( it_exchange_get_page_url( 'transaction' ) ) . '" method="post">';
-    $payment_form .= '<input type="hidden" name="it-exchange-transaction-method" value="2checkout" />';
-    $payment_form .= wp_nonce_field( '2checkout-checkout', '_2checkout_nonce', true, false );
-
-    $payment_form .= '<div class="hide-if-no-js">';
-    $payment_form .= '<input type="submit" class="it-exchange-2checkout-payment-button" name="2checkout_purchase" value="' . esc_attr( $twocheckout_settings['2checkout-purchase-button-label'] ) .'" />';
-
-    $payment_form .= '<script>' . "\n";
-    $payment_form .= '  jQuery(".it-exchange-2checkout-payment-button").click(function(){' . "\n";
-    $payment_form .= '    var token = function(res){' . "\n";
-    $payment_form .= '      var $twocheckoutToken = jQuery("<input type=hidden name=2checkoutToken />").val(res.id);' . "\n";
-    $payment_form .= '      jQuery("form.2checkout_form").append($twocheckoutToken).submit();' . "\n";
-    $payment_form .= '      it_exchange_2checkout_processing_payment_popup();' . "\n";
-    $payment_form .= '    };' . "\n";
-    $payment_form .= '    2CheckoutCheckout.open({' . "\n";
-    $payment_form .= '      key:         "' . esc_js( $publishable_key ) . '",' . "\n";
-    $payment_form .= '      amount:      "' . esc_js( number_format( it_exchange_get_cart_total( false ), 2, '', '' ) ) . '",' . "\n";
-    $payment_form .= '      currency:    "' . esc_js( $general_settings['default-currency'] ) . '",' . "\n";
-    $payment_form .= '      name:        "' . empty( $general_settings['company-name'] ) ? '' : esc_js( $general_settings['company-name'] ) . '",' . "\n";
-    $payment_form .= '      description: "' . esc_js( it_exchange_get_cart_description() ) . '",' . "\n";
-    $payment_form .= '      panelLabel:  "Checkout",' . "\n";
-    $payment_form .= '      token:       token' . "\n";
-    $payment_form .= '    });' . "\n";
-    $payment_form .= '    return false;' . "\n";
-    $payment_form .= '  });' . "\n";
-    $payment_form .= '</script>' . "\n";
-
-    $payment_form .= '</form>';
-    $payment_form .= '</div>';
-
-    return $payment_form;
 }
 add_filter( 'it_exchange_get_2checkout_make_payment_button', 'it_exchange_2checkout_addon_make_payment_button', 10, 2 );
 
 /**
- * Gets the interpretted transaction status from valid 2checkout transaction statuses
+ * Gets the interpretted transaction status from valid 2Checkout transaction statuses
  *
  * Most gateway transaction stati are going to be lowercase, one word strings.
  * Hooking a function to the it_exchange_transaction_status_label_[addon-slug] filter
@@ -158,25 +164,25 @@ add_filter( 'it_exchange_get_2checkout_make_payment_button', 'it_exchange_2check
  *
  * @since 1.0.0
  *
- * @param string $status the string of the 2checkout transaction
+ * @param string $status the string of the 2Checkout transaction
  * @return string translaction transaction status
 */
 function it_exchange_2checkout_addon_transaction_status_label( $status ) {
     switch ( $status ) {
         case 'succeeded':
-            return __( 'Paid', 'it-l10n-exchange-addon-2checkout' );
+            return __( 'Paid', 'LION' );
         case 'refunded':
-            return __( 'Refunded', 'it-l10n-exchange-addon-2checkout' );
+            return __( 'Refunded', 'LION' );
         case 'partial-refund':
-            return __( 'Partially Refunded', 'it-l10n-exchange-addon-2checkout' );
+            return __( 'Partially Refunded', 'LION' );
         case 'needs_response':
-            return __( 'Disputed: 2Checkout needs a response', 'it-l10n-exchange-addon-2checkout' );
+            return __( 'Disputed: 2Checkout needs a response', 'LION' );
         case 'under_review':
-            return __( 'Disputed: Under review', 'it-l10n-exchange-addon-2checkout' );
+            return __( 'Disputed: Under review', 'LION' );
         case 'won':
-            return __( 'Disputed: Won, Paid', 'it-l10n-exchange-addon-2checkout' );
+            return __( 'Disputed: Won, Paid', 'LION' );
         default:
-            return __( 'Unknown', 'it-l10n-exchange-addon-2checkout' );
+            return __( 'Unknown', 'LION' );
     }
 }
 add_filter( 'it_exchange_transaction_status_label_2checkout', 'it_exchange_2checkout_addon_transaction_status_label' );
@@ -198,6 +204,160 @@ add_filter( 'it_exchange_transaction_status_label_2checkout', 'it_exchange_2chec
 */
 function it_exchange_2checkout_transaction_is_cleared_for_delivery( $cleared, $transaction ) {
     $valid_stati = array( 'succeeded', 'partial-refund', 'won' );
+
     return in_array( it_exchange_get_transaction_status( $transaction ), $valid_stati );
 }
 add_filter( 'it_exchange_2checkout_transaction_is_cleared_for_delivery', 'it_exchange_2checkout_transaction_is_cleared_for_delivery', 10, 2 );
+
+
+
+
+/**
+ * Returns the Unsubscribe button for 2Checkout
+ *
+ * @since 1.1.0
+ *
+ * @param string $output 2Checkout output (should be empty)
+ * @param array $options Recurring Payments options
+ * @param object $transaction Transaction object
+ * @return string
+*/
+function it_exchange_2checkout_unsubscribe_action( $output, $options, $transaction ) {
+	$twocheckout_profile_id = it_exchange_get_recurring_payments_addon_transaction_subscription_id( $transaction );
+
+	if ( !empty( $twocheckout_profile_id ) ) {
+		$output  = '<a class="button" href="https://www.2checkout.com/va/sales/">';
+		$output .= $options['label'];
+		$output .= '</a>';
+	}
+
+	return $output;
+}
+add_filter( 'it_exchange_2checkout_unsubscribe_action', 'it_exchange_2checkout_unsubscribe_action', 10, 3 );
+
+/**
+ * Performs user requested unsubscribe
+ *
+ * @since 1.3.0
+ *
+ * @return void
+*/
+function it_exchange_2checkout_unsubscribe_action_submit() {
+	if ( isset( $_GET[ 'it-exchange-2checkout-nonce' ] )
+		 && isset( $_GET[ 'it-exchange-2checkout-action' ] )
+		 && wp_verify_nonce( $_GET[ 'it-exchange-2checkout-nonce' ], '2checkout-' . $_GET[ 'it-exchange-2checkout-action' ] )
+		 && isset( $_GET[ 'it-exchange-2checkout-profile-id' ] ) ) {
+
+		$settings = it_exchange_get_option( 'addon_2checkout' );
+		$twocheckout_profile_id = $_GET[ 'it-exchange-2checkout-profile-id' ];
+		$transaction = it_exchange_get_transaction( get_post( $_GET[ 'it-exchange-2checkout-transaction-id' ] ) );
+
+		if ( 'unsubscribe-user' == $_GET[ 'it-exchange-2checkout-action' ] && !( is_admin() && current_user_can( 'administrator' ) ) ) {
+			return;
+		}
+
+		try {
+			switch( $_GET[ 'it-exchange-2checkout-action' ] ) {
+
+				case 'unsubscribe':
+					it_exchange_2checkout_addon_update_profile_status( $twocheckout_profile_id, 'Cancel', 'Admin cancelled' );
+
+					$transaction->update_transaction_meta( 'subscriber_status', 'cancelled' );
+					$transaction->update_transaction_meta( 'subscriber_status_user', get_current_user_id() );
+					$transaction->update_transaction_meta( 'subscriber_status_date', date_i18n( 'm/d/Y' ) );
+
+					break;
+
+				case 'unsubscribe-user':
+					it_exchange_2checkout_addon_update_profile_status( $twocheckout_profile_id, 'Cancel', 'User cancelled' );
+
+					$transaction->update_transaction_meta( 'subscriber_status', 'cancelled' );
+					$transaction->update_transaction_meta( 'subscriber_status_user', get_current_user_id() );
+					$transaction->update_transaction_meta( 'subscriber_status_date', date_i18n( 'm/d/Y' ) );
+
+					break;
+
+			}
+
+			it_exchange_recurring_payments_addon_update_transaction_subscription_id( $transaction, '' );
+		}
+		catch( Exception $e ) {
+			it_exchange_add_message( 'error', $e->getMessage() );
+		}
+
+	}
+}
+add_action( 'init', 'it_exchange_2checkout_unsubscribe_action_submit' );
+
+
+/**
+ * Output the Cancel URL for the Payments screen
+ *
+ * @since 1.3.1
+ *
+ * @param object $transaction iThemes Transaction object
+ * @return void
+*/
+function it_exchange_2checkout_after_payment_details_cancel_url( $transaction = null ) {
+	if ( empty( $transaction ) ) {
+		$transaction = it_exchange_get_transaction( $GLOBALS[ 'post' ] );
+	}
+
+	$cart_object = get_post_meta( $transaction->ID, '_it_exchange_cart_object', true );
+	foreach ( $cart_object->products as $product ) {
+		$autorenews = $transaction->get_transaction_meta( 'subscription_autorenew_' . $product['product_id'], true );
+
+		if ( $autorenews ) {
+			$twocheckout_profile_id = it_exchange_get_recurring_payments_addon_transaction_subscription_id( $transaction );
+
+			$status = $transaction->get_transaction_meta( 'subscriber_status', true );
+			$status_user = $transaction->get_transaction_meta( 'subscriber_status_user', true );
+			$status_date = $transaction->get_transaction_meta( 'subscriber_status_date', true );
+
+			switch( $status ) {
+
+				case 'deactivated':
+					$output = __( 'Recurring payment has been deactivated', 'LION' );
+					break;
+
+				case 'cancelled':
+					$by = '';
+
+					if ( !empty( $status_user ) ) {
+						$status_user = get_userdata( $status_user );
+
+						if ( !empty( $status_user ) ) {
+							$by = sprintf( __( 'by %s', 'LION' ), $status_user->user_login );
+						}
+					}
+
+					if ( !empty( $status_date ) ) {
+						$output = sprintf( __( 'Recurring payment was cancelled %s on %s', 'LION' ), $by, $status_date );
+					}
+					else {
+						$output = sprintf( __( 'Recurring payment has been cancelled %s', 'LION' ), $by );
+					}
+					break;
+
+				case 'active':
+				default:
+					if ( empty( $twocheckout_profile_id ) ) {
+						$output = __( 'Recurring Profile not found', 'LION' );
+					}
+					else {
+						$output  = '<a href="https://www.2checkout.com/va/sales/">' . __( 'Cancel Recurring Payment', 'LION' ) . '</a>';
+					}
+					break;
+			}
+			?>
+			<div class="transaction-autorenews clearfix spacing-wrapper">
+				<div class="recurring-payment-cancel-options left">
+					<div class="recurring-payment-status-name"><?php echo $output; ?></div>
+				</div>
+			</div>
+			<?php
+			continue;
+		}
+	}
+}
+add_action( 'it_exchange_after_payment_details_cancel_url_for_2checkout', 'it_exchange_2checkout_after_payment_details_cancel_url' );

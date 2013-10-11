@@ -16,7 +16,7 @@ Version History
 if ( defined( 'ITHEMES_UPDATER_DISABLE' ) && ITHEMES_UPDATER_DISABLE )
 	return;
 
-if ( ! is_admin() )
+if ( !is_admin() )
 	return;
 
 if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
@@ -99,13 +99,13 @@ class Ithemes_Updater_Init {
 			$this->enable_ssl_ca_patch();
 
 
-		if ( ! empty( $_GET['ithemes-updater-force-refresh'] ) && current_user_can( 'manage_options' ) )
+		if ( !empty( $_GET['ithemes-updater-force-refresh'] ) && current_user_can( 'manage_options' ) )
 			$this->flush( 'forced' );
 		else if ( empty( $this->options['expiration'] ) || ( $this->options['expiration'] <= time() ) )
 			$this->flush( 'expired' );
 		else if ( $this->is_expired( $this->options['timestamp'] ) )
 			$this->flush( 'got stale' );
-		else if ( ! empty( $this->new_packages ) )
+		else if ( !empty( $this->new_packages ) )
 			$this->flush( 'new packages' );
 	}
 
@@ -123,7 +123,7 @@ class Ithemes_Updater_Init {
 
 		$this->options = get_site_option( $this->option_name, false );
 
-		if ( ( false === $this->options ) || ! is_array( $this->options ) )
+		if ( ( false === $this->options ) || !is_array( $this->options ) )
 			$this->options = array();
 
 		$this->options = array_merge( $this->default_options, $this->options );
@@ -159,7 +159,7 @@ class Ithemes_Updater_Init {
 	public function add_ca_patch_to_curl_opts( $handle ) {
 		$url = curl_getinfo( $handle, CURLINFO_EFFECTIVE_URL );
 
-		if ( ! preg_match( '/^https.*(api|downloads)\.ithemes\.com/', $url ) )
+		if ( !preg_match( '/^https.*(api|downloads)\.ithemes\.com/', $url ) )
 			return;
 
 		curl_setopt( $handle, CURLOPT_CAINFO, dirname( __FILE__ ) . '/ca/cacert.crt' );
@@ -188,7 +188,7 @@ class Ithemes_Updater_Init {
 		$deactivated_path = WP_PLUGIN_DIR . "/$deactivated_path";
 
 		foreach ( $this->packages as $package => $paths ) {
-			if ( ! in_array( $deactivated_path, $paths ) || ( count( $paths ) > 1 ) )
+			if ( !in_array( $deactivated_path, $paths ) || ( count( $paths ) > 1 ) )
 				continue;
 
 			$index = array_search( $package, $this->options['packages'] );
@@ -220,7 +220,7 @@ class Ithemes_Updater_Init {
 		else
 			$url = admin_url( 'options-general.php' ) . "?page={$this->page_name}";
 
-		echo '<div class="updated fade"><p>' . wp_sprintf( __( 'To receive automatic updates for %l, use the <a href="%s">iThemes Licensing</a> page found in the Settings menu.', 'it-l10n-exchange-addon-2checkout' ), $names, $url ) . '</p></div>';
+		echo '<div class="updated fade"><p>' . wp_sprintf( __( 'To receive automatic updates for %l, use the <a href="%s">iThemes Licensing</a> page found in the Settings menu.', 'it-l10n-exchange' ), $names, $url ) . '</p></div>';
 
 
 		$this->options['packages'] = array_keys( $this->packages );
@@ -228,16 +228,16 @@ class Ithemes_Updater_Init {
 	}
 
 	public function add_admin_pages() {
-		if ( is_multisite() && ! $this->options['show_on_sites'] )
+		if ( is_multisite() && !$this->options['show_on_sites'] )
 			return;
 
-		$this->page_ref = add_options_page( __( 'iThemes Licensing', 'it-l10n-exchange-addon-2checkout' ), __( 'iThemes Licensing', 'it-l10n-exchange-addon-2checkout' ), 'manage_options', $this->page_name, array( $this, 'settings_index' ) );
+		$this->page_ref = add_options_page( __( 'iThemes Licensing', 'it-l10n-exchange' ), __( 'iThemes Licensing', 'it-l10n-exchange' ), 'manage_options', $this->page_name, array( $this, 'settings_index' ) );
 
 		add_action( "load-{$this->page_ref}", array( $this, 'load_settings_page' ) );
 	}
 
 	public function add_network_admin_pages() {
-		$this->page_ref = add_submenu_page( 'settings.php', __( 'iThemes Licensing', 'it-l10n-exchange-addon-2checkout' ), __( 'iThemes Licensing', 'it-l10n-exchange-addon-2checkout' ), 'manage_options', $this->page_name, array( $this, 'settings_index' ) );
+		$this->page_ref = add_submenu_page( 'settings.php', __( 'iThemes Licensing', 'it-l10n-exchange' ), __( 'iThemes Licensing', 'it-l10n-exchange' ), 'manage_options', $this->page_name, array( $this, 'settings_index' ) );
 
 		add_action( "load-{$this->page_ref}", array( $this, 'load_settings_page' ) );
 	}
@@ -255,16 +255,16 @@ class Ithemes_Updater_Init {
 	}
 
 	public function filter_update_plugins( $update_plugins ) {
-		if ( ! is_object( $update_plugins ) )
+		if ( !is_object( $update_plugins ) )
 			return $update_plugins;
 
-		if ( ! isset( $update_plugins->response ) || ! is_array( $update_plugins->response ) )
+		if ( !isset( $update_plugins->response ) || !is_array( $update_plugins->response ) )
 			$update_plugins->response = array();
 
 		if ( $this->do_flush )
 			$this->flush();
 
-		if ( ! is_array( $this->options ) || ! isset( $this->options['update_plugins'] ) )
+		if ( !is_array( $this->options ) || !isset( $this->options['update_plugins'] ) )
 			$this->load();
 
 		if ( isset( $this->options['update_plugins'] ) && is_array( $this->options['update_plugins'] ) )
@@ -274,16 +274,16 @@ class Ithemes_Updater_Init {
 	}
 
 	public function filter_update_themes( $update_themes ) {
-		if ( ! is_object( $update_themes ) )
+		if ( !is_object( $update_themes ) )
 			return $update_themes;
 
-		if ( ! isset( $update_themes->response ) || ! is_array( $update_themes->response ) )
+		if ( !isset( $update_themes->response ) || !is_array( $update_themes->response ) )
 			$update_themes->response = array();
 
 		if ( $this->do_flush )
 			$this->flush();
 
-		if ( ! is_array( $this->options ) || ! isset( $this->options['update_themes'] ) )
+		if ( !is_array( $this->options ) || !isset( $this->options['update_themes'] ) )
 			$this->load();
 
 		if ( isset( $this->options['update_themes'] ) && is_array( $this->options['update_themes'] ) )
@@ -305,7 +305,7 @@ class Ithemes_Updater_Init {
 			return;
 
 		$url = admin_url( 'options-general.php' ) . "?page={$this->page_name}";
-		$this->registration_link = sprintf( '<a href="%1$s" title="%2$s">%3$s</a>', $url, __( 'Manage iThemes product licenses to receive automatic upgrade support', 'it-l10n-exchange-addon-2checkout' ), __( 'License', 'it-l10n-exchange-addon-2checkout' ) );
+		$this->registration_link = sprintf( '<a href="%1$s" title="%2$s">%3$s</a>', $url, __( 'Manage iThemes product licenses to receive automatic upgrade support', 'it-l10n-exchange' ), __( 'License', 'it-l10n-exchange' ) );
 	}
 
 	public function filter_plugin_action_links( $actions, $plugin_file, $plugin_data, $context ) {

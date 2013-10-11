@@ -20,20 +20,23 @@
  * This registers our plugin as a 2checkout addon
  *
  * @since 1.0.0
-*/
+ */
 function it_exchange_register_2checkout_addon() {
+
 	$options = array(
-		'name'              => __( '2Checkout', 'it-l10n-exchange-addon-2checkout' ),
-		'description'       => __( 'Process transactions via 2checkout.', 'it-l10n-exchange-addon-2checkout' ),
-		'author'            => 'WebDevStudios',
-		'author_url'        => 'http://webdevstudios.com',
-		'icon'              => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/images/2checkout50px.png' ),
-		'wizard-icon'       => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/images/wizard-2checkout.png' ),
-		'file'              => dirname( __FILE__ ) . '/init.php',
-		'category'          => 'transaction-methods',
+		'name' => __( '2Checkout', 'LION' ),
+		'description' => __( 'Process transactions via 2Checkout.', 'LION' ),
+		'author' => 'WebDevStudios',
+		'author_url' => 'http://webdevstudios.com',
+		'icon' => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/images/2checkout50px.png' ),
+		'wizard-icon' => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/images/wizard-2checkout.png' ),
+		'file' => dirname( __FILE__ ) . '/init.php',
+		'category' => 'transaction-methods',
 		'settings-callback' => 'it_exchange_2checkout_addon_settings_callback',
 	);
+
 	it_exchange_register_addon( '2checkout', $options );
+
 }
 add_action( 'it_exchange_register_addons', 'it_exchange_register_2checkout_addon' );
 
@@ -41,9 +44,11 @@ add_action( 'it_exchange_register_addons', 'it_exchange_register_2checkout_addon
  * Loads the translation data for WordPress
  *
  * @since 1.0.0
-*/
+ */
 function it_exchange_2checkout_set_textdomain() {
-	load_plugin_textdomain( 'it-l10n-exchange-addon-2checkout', false, dirname( plugin_basename( __FILE__  ) ) . '/lang/' );
+
+	load_plugin_textdomain( 'LION', false, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
+
 }
 add_action( 'plugins_loaded', 'it_exchange_2checkout_set_textdomain' );
 
@@ -51,10 +56,14 @@ add_action( 'plugins_loaded', 'it_exchange_2checkout_set_textdomain' );
  * Registers Plugin with iThemes updater class
  *
  * @since 1.0.0
+ *
  * @param object $updater ithemes updater object
-*/
+ */
 function ithemes_exchange_addon_2checkout_updater_register( $updater ) {
-	    $updater->register( 'exchange-addon-2checkout', __FILE__ );
+
+	$updater->register( 'exchange-addon-2checkout', __FILE__ );
+
 }
 add_action( 'ithemes_updater_register', 'ithemes_exchange_addon_2checkout_updater_register' );
+
 require( dirname( __FILE__ ) . '/lib/updater/load.php' );
