@@ -225,8 +225,11 @@ add_filter( 'it_exchange_2checkout_transaction_is_cleared_for_delivery', 'it_exc
 function it_exchange_2checkout_unsubscribe_action( $output, $options, $transaction ) {
 	$twocheckout_profile_id = it_exchange_get_recurring_payments_addon_transaction_subscription_id( $transaction );
 
+	// Temporary workaround
+	$twocheckout_profile_id = 1;
+
 	if ( !empty( $twocheckout_profile_id ) ) {
-		$output  = '<a class="button" href="https://www.2checkout.com/va/sales/">';
+		$output  = '<a class="button" href="https://www.2checkout.com/va/sales/" target="_blank">';
 		$output .= $options['label'];
 		$output .= '</a>';
 	}
@@ -314,6 +317,10 @@ function it_exchange_2checkout_after_payment_details_cancel_url( $transaction = 
 			$status_user = $transaction->get_transaction_meta( 'subscriber_status_user', true );
 			$status_date = $transaction->get_transaction_meta( 'subscriber_status_date', true );
 
+			// Temporary workaround
+			$twocheckout_profile_id = 1;
+			$status = 'active';
+
 			switch( $status ) {
 
 				case 'deactivated':
@@ -345,7 +352,7 @@ function it_exchange_2checkout_after_payment_details_cancel_url( $transaction = 
 						$output = __( 'Recurring Profile not found', 'LION' );
 					}
 					else {
-						$output  = '<a href="https://www.2checkout.com/va/sales/">' . __( 'Cancel Recurring Payment', 'LION' ) . '</a>';
+						$output  = '<a href="https://www.2checkout.com/va/sales/" target="_blank">' . __( 'Cancel Recurring Payment', 'LION' ) . '</a>';
 					}
 					break;
 			}
