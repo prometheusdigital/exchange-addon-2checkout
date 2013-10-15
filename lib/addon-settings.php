@@ -62,7 +62,7 @@ function it_exchange_save_2checkout_wizard_settings( $errors ) {
     $IT_Exchange_2Checkout_Add_On = new IT_Exchange_2Checkout_Add_On();
     return $IT_Exchange_2Checkout_Add_On->save_wizard_settings();
 }
-// add_action( 'it_exchange_save_2checkout_wizard_settings', 'it_exchange_save_2checkout_wizard_settings' );
+add_action( 'it_exchange_save_2checkout_wizard_settings', 'it_exchange_save_2checkout_wizard_settings' );
 
 /**
  * Default settings for 2Checkout
@@ -288,18 +288,17 @@ class IT_Exchange_2Checkout_Add_On {
         if ( empty( $_REQUEST['it_exchange_settings-wizard-submitted'] ) )
             return;
 
-		$defaults = it_exchange_cybersource_addon_default_settings( array() );
-
-        $twocheckout_settings = array(
-			'2checkout_checkout_type' => $defaults[ '2checkout_checkout_type' ],
-			'2checkout_default_payment_method' => $defaults[ '2checkout_default_payment_method' ],
-			'2checkout_purchase_button_label' => $defaults[ '2checkout_purchase_button_label' ]
+		$default_wizard_2checkout_settings = array();
+		
+		$fields = array(
+			'2checkout_sid',
+			'2checkout_secret' ,
+			'2checkout_checkout_type',
+			'2checkout_default_payment_method',
+			'2checkout_sandbox_mode',
+			'2checkout_purchase_button_label',
 		);
-
-        // Fields to save
-        $fields = array_keys( $defaults );
-
-        $default_wizard_2checkout_settings = apply_filters( 'default_wizard_2checkout_settings', $fields );
+		$default_wizard_2checkout_settings = apply_filters( 'default_wizard_2checkout_settings', $fields );
 
         foreach( $default_wizard_2checkout_settings as $var ) {
             if ( isset( $_REQUEST['it_exchange_settings-' . $var] ) ) {

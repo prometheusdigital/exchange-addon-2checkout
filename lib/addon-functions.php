@@ -311,11 +311,14 @@ function it_exchange_2checkout_addon_checkout_button( $options ) {
 
 		$twocheckout_data[ 'li_' . $item_count . '_tangible' ] = 'N';//'Y';
 
+		/*
+		we're going to set all of them as non-tangible, because Exchange keeps track of all that
 		if ( it_exchange_product_supports_feature( $product['product_id'], 'downloads', array( 'setting' => 'digital-downloads-product-type' ) ) ) {
 			if ( it_exchange_product_has_feature( $product['product_id'], 'downloads', array( 'setting' => 'digital-downloads-product-type' ) ) ) {
 				$twocheckout_data[ 'li_' . $item_count . '_tangible' ] = 'N';
 			}
 		}
+		*/
 
 		// Recurring info
 		if ( !empty( $recurring_products ) ) {
