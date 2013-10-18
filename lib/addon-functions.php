@@ -166,10 +166,10 @@ function it_exchange_2checkout_addon_checkout_button( $options ) {
 		$transaction_object->ID = 0;
 	}
 
-	$url = 'https://www.2checkout.com/checkout/purchase';
+	$checkout_type = 'purchase';
 
 	if ( 'spurchase' == $settings[ '2checkout_checkout_type' ] ) {
-		$url = 'https://www.2checkout.com/checkout/spurchase';
+		$checkout_type = 'spurchase';
 	}
 
 	$recurring_products = array();
@@ -365,7 +365,7 @@ function it_exchange_2checkout_addon_checkout_button( $options ) {
 
 	ob_start();
 
-	Twocheckout_Charge::direct( $twocheckout_data, $settings[ '2checkout_purchase_button_label' ] );
+	Twocheckout_Charge::direct( $twocheckout_data, $settings[ '2checkout_purchase_button_label' ], $checkout_type );
 
 	return ob_get_clean();
 }
