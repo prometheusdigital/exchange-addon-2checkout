@@ -166,12 +166,6 @@ function it_exchange_2checkout_addon_checkout_button( $options ) {
 		$transaction_object->ID = 0;
 	}
 
-	$url = 'https://www.2checkout.com/checkout/purchase';
-
-	if ( 'spurchase' == $settings[ '2checkout_checkout_type' ] ) {
-		$url = 'https://www.2checkout.com/checkout/spurchase';
-	}
-
 	$recurring_products = array();
 
 	if ( 1 === it_exchange_get_cart_products_count() ) {
