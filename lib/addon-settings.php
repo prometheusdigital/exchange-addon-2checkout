@@ -76,7 +76,6 @@ function it_exchange_2checkout_addon_default_settings( $values ) {
     $defaults = array(
         '2checkout_sid'                    => '',
         '2checkout_secret'                 => '',
-        '2checkout_checkout_type'          => 'purchase',
 		'2checkout_default_payment_method' => 'CC',
         '2checkout_sandbox_mode'           => false,
         '2checkout_purchase_button_label'  => __( 'Purchase', 'LION' ),
@@ -214,17 +213,6 @@ class IT_Exchange_2Checkout_Add_On {
                 <?php $form->add_password( '2checkout_secret' ); ?>
             </p>
             <p>
-                <label for="2checkout_checkout_type"><?php _e( 'Checkout Type', 'LION' ); ?> <span class="tip" title="<?php _e( 'This will change the checkout style used for 2Checkout purchases.', 'LION' ); ?>">i</span></label>
-				<?php
-					$checkout_types = array(
-						'purchase' => __( 'Standard Checkout (purchase)', 'LION' ),
-						'spurchase' => __( 'Single Page Checkout (spurchase)', 'LION' )
-					);
-
-					$form->add_drop_down( '2checkout_checkout_type', $checkout_types );
-				?>
-            </p>
-            <p>
                 <label for="2checkout_default_payment_method"><?php _e( 'Default Payment Method', 'LION' ); ?> <span class="tip" title="<?php _e( 'This will change the default payment method selected when the customer goes to the checkout page.', 'LION' ); ?>">i</span></label>
 				<?php
 					$payment_methods = array(
@@ -288,16 +276,14 @@ class IT_Exchange_2Checkout_Add_On {
         if ( empty( $_REQUEST['it_exchange_settings-wizard-submitted'] ) )
             return;
 
-		$default_wizard_2checkout_settings = array();
-		
 		$fields = array(
 			'2checkout_sid',
-			'2checkout_secret' ,
-			'2checkout_checkout_type',
+			'2checkout_secret',
 			'2checkout_default_payment_method',
 			'2checkout_sandbox_mode',
 			'2checkout_purchase_button_label',
 		);
+
 		$default_wizard_2checkout_settings = apply_filters( 'default_wizard_2checkout_settings', $fields );
 
         foreach( $default_wizard_2checkout_settings as $var ) {
