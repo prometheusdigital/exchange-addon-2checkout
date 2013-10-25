@@ -37,7 +37,11 @@ function it_exchange_process_2checkout_form() {
 		$it_exchange_customer = it_exchange_get_current_customer();
 		$transaction_object = it_exchange_generate_transaction_object();
 
-		$transaction_object->ID = it_exchange_add_transaction( '2checkout', 0, 'pending', $it_exchange_customer->id, $transaction_object );
+		$temp_id = it_exchange_create_unique_hash();
+
+		it_exchange_add_transient_transaction( '2checkout', $temp_id, $it_exchange_customer->id, $transaction_object );
+
+		$transaction_object->ID = $temp_id;
 
 		echo it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $transaction_object );
 
@@ -73,8 +77,6 @@ function it_exchange_2checkout_addon_process_transaction( $status, $transaction_
 	$payment_id = $invoice_id = 0;
 
 	if ( isset( $_REQUEST[ 'it-exchange-transaction-method' ] ) && '2checkout' === $_REQUEST[ 'it-exchange-transaction-method' ] ) {
-		$it_exchange_customer = it_exchange_get_current_customer();
-
 		if ( isset( $_REQUEST[ 'it-exchange-transaction-return' ] ) && 'complete' === $_REQUEST[ 'it-exchange-transaction-return' ] ) {
 			try {
 				// Check for return to thank you page or 2Checkout INS-response
@@ -130,16 +132,15 @@ function it_exchange_2checkout_addon_process_transaction( $status, $transaction_
 				return false;
 			}
 
-			if ( !empty( $payment_id ) ) {
-				$args = array(
-					'ID' => $payment_id,
-					'_it_exchange_transaction_status' => 'paid',
-				);
+			if ( !empty( $payment_id ) && $transient_data = it_exchange_get_transient_transaction( '2checkout', $payment_id ) ) {
+				it_exchange_delete_transient_transaction( 'paypal-standard', $payment_id );
 
-				return it_exchange_update_transaction( $args );
+				return it_exchange_add_transaction( '2checkout', $invoice_id, 'paid', $transient_data[ 'customer_id' ], $transient_data[ 'transaction_object' ] );
 			}
 			else {
-				return it_exchange_add_transaction( '2checkout', $invoice_id, 'paid', $it_exchange_customer->id, $transaction_object );
+				$it_exchange_customer = it_exchange_get_current_customer();
+
+				return it_exchange_add_transaction( '2checkout', $invoice_id, 'pending', $it_exchange_customer->id, $transaction_object );
 			}
 		}
 	}
