@@ -232,14 +232,21 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 
 	if ( function_exists( 'it_exchange_get_customer_shipping_address' ) ) {
 		$shipping_address = it_exchange_get_customer_shipping_address( $it_exchange_customer->id );
-
-		if ( empty( $shipping_address ) ) {
-			$shipping_address = $billing_address;
-		}
 	}
 
-	$billing_address = array_merge( $default_address, $billing_address );
-	$shipping_address = array_merge( $default_address, $shipping_address );
+	if ( !empty( $billing_address ) ) {
+		$billing_address = array_merge( $default_address, $billing_address );
+	}
+	else {
+		$billing_address = $default_address;
+	}
+
+	if ( !empty( $shipping_address ) ) {
+		$shipping_address = array_merge( $default_address, $shipping_address );
+	}
+	else {
+		$shipping_address = $billing_address;
+	}
 
 	// Pass through Products
 	// https://www.2checkout.com/documentation/checkout/parameter-sets/pass-through-products/
