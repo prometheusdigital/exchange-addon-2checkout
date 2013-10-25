@@ -276,8 +276,6 @@ class IT_Exchange_2Checkout_Add_On {
         if ( empty( $_REQUEST['it_exchange_settings-wizard-submitted'] ) )
             return;
 
-		$default_wizard_2checkout_settings = array();
-
 		$fields = array(
 			'2checkout_sid',
 			'2checkout_secret',
@@ -285,6 +283,7 @@ class IT_Exchange_2Checkout_Add_On {
 			'2checkout_sandbox_mode',
 			'2checkout_purchase_button_label',
 		);
+
 		$default_wizard_2checkout_settings = apply_filters( 'default_wizard_2checkout_settings', $fields );
 
         foreach( $default_wizard_2checkout_settings as $var ) {

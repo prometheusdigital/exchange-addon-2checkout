@@ -150,15 +150,14 @@ function it_exchange_2checkout_addon_delete_id_from_customer( $twocheckout_id ) 
 }
 
 /**
- * @param array $options
+ * @param IT_Exchange_Customer $it_exchange_customer
+ * @param object $transaction_object
+ * @param array $args
  *
  * @return array
  * @throws Exception
  */
-function it_exchange_2checkout_addon_checkout_button( $options ) {
-
-	$it_exchange_customer = it_exchange_get_current_customer();
-	$transaction_object = it_exchange_generate_transaction_object();
+function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $transaction_object, $args = array() ) {
 
 	$settings = it_exchange_get_option( 'addon_2checkout' );
 
@@ -274,7 +273,7 @@ function it_exchange_2checkout_addon_checkout_button( $options ) {
 		'currency_code' => $transaction_object->currency,
 		'merchant_order_id' => $transaction_object->ID,
 		'pay_method' => $settings[ '2checkout_default_payment_method' ],
-		'x_receipt_link_url' => add_query_arg( 'it-exchange-transaction-method', '2checkout', it_exchange_get_page_url( 'transaction' ) ),
+		'x_receipt_link_url' => add_query_arg( array( 'it-exchange-transaction-method' => '2checkout', 'it-exchange-transaction-return' => 'complete' ), it_exchange_get_page_url( 'transaction' ) ),
 
 		// 'lang' => 'en', @todo Multi-lingual support
 		// 'coupon' => '', @todo 2Checkout coupon support
@@ -359,7 +358,7 @@ function it_exchange_2checkout_addon_checkout_button( $options ) {
 
 	ob_start();
 
-	Twocheckout_Charge::direct( $twocheckout_data, $settings[ '2checkout_purchase_button_label' ] );
+	Twocheckout_Charge::direct( $twocheckout_data, 'auto' );
 
 	return ob_get_clean();
 }
