@@ -365,6 +365,8 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 
 	ob_start();
 
+	Twocheckout_Charge::direct( $twocheckout_data, 'auto' );
+
 	return ob_get_clean();
 }
 
