@@ -1,0 +1,2 @@
+1.0.0 - 2013-10-29 - Web Design Studios
+	Initial Release
