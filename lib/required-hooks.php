@@ -74,86 +74,17 @@ function it_exchange_2checkout_addon_process_transaction( $status, $transaction_
 		return $status;
 	}
 
-	$payment_id = $invoice_id = 0;
-
-	if ( isset( $_REQUEST[ 'it-exchange-transaction-method' ] ) && '2checkout' === $_REQUEST[ 'it-exchange-transaction-method' ] ) {
-		if ( isset( $_REQUEST[ 'it-exchange-transaction-return' ] ) && 'complete' === $_REQUEST[ 'it-exchange-transaction-return' ] ) {
-			try {
-				// Check for return to thank you page or 2Checkout INS-response
-				if ( isset( $_REQUEST[ 'credit_card_processed' ] ) || isset( $_REQUEST[ 'message_type' ] ) ) {
-					$settings = it_exchange_get_option( 'addon_2checkout' );
-
-					$twocheckout_sid = $settings[ '2checkout_sid' ];
-					$twocheckout_secret = $settings[ '2checkout_secret' ];
-
-					// 2Checkout Receipt Return URL
-					if ( isset( $_REQUEST[ 'merchant_order_id' ] ) ) {
-						$payment_id = $_REQUEST[ 'merchant_order_id' ];
-						$invoice_id = $_REQUEST[ 'order_number' ];
-						$total = $_REQUEST[ 'total' ];
-
-						$twocheckout_md5 = strtoupper( $_REQUEST[ 'key' ] );
-
-						if ( $settings[ '2checkout_sandbox_mode' ] ) {
-							$check_key = $twocheckout_secret . $twocheckout_sid . '1' . $total;
-						}
-						else {
-							$check_key = $twocheckout_secret . $twocheckout_sid . $invoice_id . $total;
-						}
-
-						$check_key = strtoupper( md5( $check_key ) );
-					}
-					// 2Checkout IPN Notifications
-					elseif ( isset( $_REQUEST[ 'vendor_order_id' ] ) ) {
-						$payment_id = $_REQUEST[ 'sale_id' ];
-						$invoice_id = $_REQUEST[ 'invoice_id' ];
-
-						// $vendor_order_id = $_REQUEST[ 'vendor_order_id' ];
-						// $vendor_id = $_REQUEST[ 'vendor_id' ];
-
-						$twocheckout_md5 = strtoupper( $_REQUEST[ 'md5_hash' ] );
-
-						$check_key = $payment_id . $twocheckout_sid . $invoice_id . $twocheckout_secret;
-						$check_key = strtoupper( md5( $check_key ) );
-					}
-					else {
-						throw new Exception( __( 'Invalid request', 'LION' ) );
-					}
-
-					if ( $check_key != $twocheckout_md5 ) {
-						throw new Exception( __( 'Invalid request', 'LION' ) );
-					}
-				}
-			}
-			catch ( Exception $e ) {
-				it_exchange_flag_purchase_dialog_error( '2checkout' );
-				it_exchange_add_message( 'error', $e->getMessage() );
-
-				return false;
-			}
-
-			if ( !empty( $payment_id ) && $transient_data = it_exchange_get_transient_transaction( '2checkout', $payment_id ) ) {
-				it_exchange_delete_transient_transaction( 'paypal-standard', $payment_id );
-
-				return it_exchange_add_transaction( '2checkout', $invoice_id, 'paid', $transient_data[ 'customer_id' ], $transient_data[ 'transaction_object' ] );
-			}
-			else {
-				$it_exchange_customer = it_exchange_get_current_customer();
-
-				return it_exchange_add_transaction( '2checkout', $invoice_id, 'pending', $it_exchange_customer->id, $transaction_object );
-			}
-		}
-	}
-
-	return false;
+	return $status;
 
 }
-add_filter( 'it_exchange_do_transaction_2checkout', 'it_exchange_2checkout_addon_process_transaction', 10, 2 );
+//add_filter( 'it_exchange_do_transaction_2checkout', 'it_exchange_2checkout_addon_process_transaction', 10, 2 );
 
 function it_exchange_2checkout_get_transaction_confirmation_url( $url, $transaction_id ) {
+
 	it_exchange_recurring_payments_addon_update_transaction_subscription_id( it_exchange_get_transaction( get_post( $transaction_id ) ), get_post_meta( $transaction_id, '_it_exchange_transaction_method_id', true ) );
 
 	return $url;
+
 }
 
 /**

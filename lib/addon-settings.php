@@ -224,8 +224,8 @@ class IT_Exchange_2Checkout_Add_On {
 				?>
             </p>
 
-            <h4 class="hide-if-wizard"><?php _e( 'Optional: Enable 2Checkout Demo Mode', 'LION' ); ?></h4>
-            <p class="hide-if-wizard">
+            <h4><?php _e( 'Optional: Enable 2Checkout Demo Mode', 'LION' ); ?></h4>
+            <p>
                 <?php $form->add_check_box( '2checkout_sandbox_mode', array( 'class' => 'show-test-mode-options' ) ); ?>
                 <label for="2checkout_sandbox_mode"><?php _e( 'Enable 2Checkout Demo Mode?', 'LION' ); ?> <span class="tip" title="<?php _e( 'Use this mode for testing your store. This mode will need to be disabled when the store is ready to process customer payments.', 'LION' ); ?>">i</span></label>
             </p>
