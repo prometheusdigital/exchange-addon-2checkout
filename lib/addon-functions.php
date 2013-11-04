@@ -253,7 +253,7 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 
 	$twocheckout_data = array(
 		// Customer information
-		'card_holder_name' => $billing_address[ 'first-name' ] . ' ' . $billing_address[ 'last-name' ],
+		'card_holder_name' => trim( $billing_address[ 'first-name' ] . ' ' . $billing_address[ 'last-name' ] ),
 		'street_address' => $billing_address[ 'address1' ],
 		'street_address2' => $billing_address[ 'address2' ],
 		'city' => $billing_address[ 'city' ],
@@ -266,7 +266,7 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 		// 'phone_extension' => $billing_address[ 'email' ], @todo Phone extension support
 
 		// Shipping information
-		'ship_name' => $shipping_address[ 'first-name' ] . ' ' . $shipping_address[ 'last-name' ],
+		'ship_name' => trim( $shipping_address[ 'first-name' ] . ' ' . $shipping_address[ 'last-name' ] ),
 		'ship_street_address' => $shipping_address[ 'address1' ],
 		'ship_street_address2' => $shipping_address[ 'address2' ],
 		'ship_city' => $shipping_address[ 'city' ],
@@ -285,7 +285,7 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 		// 'lang' => 'en', @todo Multi-lingual support
 		// 'coupon' => '', @todo 2Checkout coupon support
 
-		// 'notify' => get_site_url() . '/?' . it_exchange_get_webhook( '2checkout' ) . '=1', @todo IPN notifications?
+		'notify' => get_site_url() . '/?' . it_exchange_get_webhook( '2checkout' ) . '=1',
 	);
 
 	if ( $settings[ '2checkout_sandbox_mode' ] ) {
