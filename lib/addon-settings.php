@@ -205,15 +205,15 @@ class IT_Exchange_2Checkout_Add_On {
             </p>
             <h4><?php _e( 'Fill out your 2Checkout API Credentials', 'LION' ); ?></h4>
             <p>
-                <label for="2checkout_sid"><?php _e( '2Checkout SID', 'LION' ); ?> <span class="tip" title="<?php _e( 'Your 2Checkout Account Number, or SID, is found in the top-right corner of your 2CO account dashboard.', 'LION' ); ?>">i</span></label>
+                <label for="2checkout_sid"><?php _e( '2Checkout SID', 'LION' ); ?> <span class="tip" title="<?php esc_attr_e( 'Your 2Checkout Account Number, or SID, is found in the top-right corner of your 2CO account dashboard.', 'LION' ); ?>">i</span></label>
                 <?php $form->add_text_box( '2checkout_sid' ); ?>
             </p>
             <p>
-                <label for="2checkout_secret"><?php _e( 'Secret Word', 'LION' ); ?> <span class="tip" title="<?php _e( 'The 2Checkout Secret Word can be found and customized under the Site Management area of your 2CO account dashboard.', 'LION' ); ?>">i</span></label>
+                <label for="2checkout_secret"><?php _e( 'Secret Word', 'LION' ); ?> <span class="tip" title="<?php esc_attr_e( 'The 2Checkout Secret Word can be found and customized under the Site Management area of your 2CO account dashboard.', 'LION' ); ?>">i</span></label>
                 <?php $form->add_password( '2checkout_secret' ); ?>
             </p>
             <p>
-                <label for="2checkout_default_payment_method"><?php _e( 'Default Payment Method', 'LION' ); ?> <span class="tip" title="<?php _e( 'This will change the default payment method selected when the customer goes to the checkout page.', 'LION' ); ?>">i</span></label>
+                <label for="2checkout_default_payment_method"><?php _e( 'Default Payment Method', 'LION' ); ?> <span class="tip" title="<?php esc_attr_e( 'This will change the default payment method selected when the customer goes to the checkout page.', 'LION' ); ?>">i</span></label>
 				<?php
 					$payment_methods = array(
 						'CC' => __( 'Credit Card - Preselect the Credit Card payment method', 'LION' ),
@@ -227,12 +227,12 @@ class IT_Exchange_2Checkout_Add_On {
             <h4><?php _e( 'Optional: Enable 2Checkout Demo Mode', 'LION' ); ?></h4>
             <p>
                 <?php $form->add_check_box( '2checkout_sandbox_mode', array( 'class' => 'show-test-mode-options' ) ); ?>
-                <label for="2checkout_sandbox_mode"><?php _e( 'Enable 2Checkout Demo Mode?', 'LION' ); ?> <span class="tip" title="<?php _e( 'Use this mode for testing your store. This mode will need to be disabled when the store is ready to process customer payments.', 'LION' ); ?>">i</span></label>
+                <label for="2checkout_sandbox_mode"><?php _e( 'Enable 2Checkout Demo Mode?', 'LION' ); ?> <span class="tip" title="<?php esc_attr_e( 'Use this mode for testing your store. This mode will need to be disabled when the store is ready to process customer payments.', 'LION' ); ?>">i</span></label>
             </p>
 
             <h4><?php _e( 'Optional: Edit Purchase Button Label', 'LION' ); ?></h4>
             <p>
-                <label for="2checkout_purchase_button_label"><?php _e( 'Purchase Button Label', 'LION' ); ?> <span class="tip" title="<?php _e( 'This is the text inside the button your customers will press to purchase with 2Checkout', 'LION' ); ?>">i</span></label>
+                <label for="2checkout_purchase_button_label"><?php _e( 'Purchase Button Label', 'LION' ); ?> <span class="tip" title="<?php esc_attr_e( 'This is the text inside the button your customers will press to purchase with 2Checkout', 'LION' ); ?>">i</span></label>
                 <?php $form->add_text_box( '2checkout_purchase_button_label' ); ?>
             </p>
         </div>
