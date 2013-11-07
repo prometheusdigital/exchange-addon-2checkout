@@ -260,7 +260,7 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 		'state' => $billing_address[ 'state' ],
 		'zip' => $billing_address[ 'zip' ],
 		'country' => $billing_address[ 'country' ],
-		'email' => $billing_address[ 'email' ],
+		'email' => ( empty( $billing_address[ 'email' ] ) ? $it_exchange_customer->data->user_email : $billing_address[ 'email' ] ),
 
 		// 'phone' => $billing_address[ 'email' ], @todo Phone support
 		// 'phone_extension' => $billing_address[ 'email' ], @todo Phone extension support
@@ -365,7 +365,7 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 
 	ob_start();
 
-	Twocheckout_Charge::direct( $twocheckout_data, 'auto' );
+	Twocheckout_Charge::direct( $twocheckout_data, $settings[ '2checkout_purchase_button_label' ] );
 
 	return ob_get_clean();
 }

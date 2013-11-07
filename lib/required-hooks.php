@@ -24,34 +24,6 @@ function it_exchange_refund_url_for_2checkout( $url ) {
 add_filter( 'it_exchange_refund_url_for_2checkout', 'it_exchange_refund_url_for_2checkout' );
 
 /**
- * Process the faux PayPal Standard form
- *
- * @since 0.4.19
- *
- * @param array $options
- * @return string HTML button
-*/
-function it_exchange_process_2checkout_form() {
-
-	if ( isset( $_REQUEST[ '2checkout_purchase' ] ) && !empty( $_REQUEST[ '2checkout_purchase' ] ) ) {
-		$it_exchange_customer = it_exchange_get_current_customer();
-		$transaction_object = it_exchange_generate_transaction_object();
-
-		$temp_id = it_exchange_create_unique_hash();
-
-		it_exchange_add_transient_transaction( '2checkout', $temp_id, $it_exchange_customer->id, $transaction_object );
-
-		$transaction_object->ID = $temp_id;
-
-		echo it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $transaction_object );
-
-		die();
-	}
-
-}
-add_action( 'wp', 'it_exchange_process_2checkout_form' );
-
-/**
  * This proccesses a 2Checkout transaction.
  *
  * The it_exchange_do_transaction_[addon-slug] action is called when
@@ -70,22 +42,15 @@ add_action( 'wp', 'it_exchange_process_2checkout_form' );
 function it_exchange_2checkout_addon_process_transaction( $status, $transaction_object ) {
 
 	// If this has been modified as true already, return.
-	if ( $status ) {
+	if ( $status || !isset( $_REQUEST[ 'ite-2checkout-purchase-dialog-nonce' ] ) ) {
+
 		return $status;
 	}
 
-	return $status;
+	return true;
 
 }
-//add_filter( 'it_exchange_do_transaction_2checkout', 'it_exchange_2checkout_addon_process_transaction', 10, 2 );
-
-function it_exchange_2checkout_get_transaction_confirmation_url( $url, $transaction_id ) {
-
-	it_exchange_recurring_payments_addon_update_transaction_subscription_id( it_exchange_get_transaction( get_post( $transaction_id ) ), get_post_meta( $transaction_id, '_it_exchange_transaction_method_id', true ) );
-
-	return $url;
-
-}
+add_filter( 'it_exchange_do_transaction_2checkout', 'it_exchange_2checkout_addon_process_transaction', 10, 2 );
 
 /**
  * Returns the button for making the payment
@@ -105,17 +70,18 @@ function it_exchange_2checkout_get_transaction_confirmation_url( $url, $transact
 function it_exchange_2checkout_addon_make_payment_button( $button, $options ) {
 
     if ( 0 >= it_exchange_get_cart_total( false ) )
-        return $button;
-
-	$settings = it_exchange_get_option( 'addon_2checkout' );
+        return '';
 
 	$it_exchange_customer = it_exchange_get_current_customer();
+	$transaction_object = it_exchange_generate_transaction_object();
 
-	$button = '<form action="' . get_site_url() . '/?2checkout-purchase-form=1" method="post">';
-	$button .= '<input type="submit" class="it-exchange-2checkout-button" name="2checkout_purchase" value="' . $settings[ '2checkout_purchase_button_label' ] .'" />';
-	$button .= '</form>';
+	$temp_id = it_exchange_create_unique_hash();
 
-	return $button;
+	it_exchange_add_transient_transaction( '2checkout', $temp_id, $it_exchange_customer->id, $transaction_object );
+
+	$transaction_object->ID = $temp_id;
+
+	return it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $transaction_object );
 
 }
 add_filter( 'it_exchange_get_2checkout_make_payment_button', 'it_exchange_2checkout_addon_make_payment_button', 10, 2 );

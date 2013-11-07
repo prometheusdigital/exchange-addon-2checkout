@@ -108,7 +108,7 @@ function it_exchange_2checkout_addon_process_webhook( $request ) {
 	}
 
 	if ( !empty( $payment_id ) && $transient_data = it_exchange_get_transient_transaction( '2checkout', $payment_id ) ) {
-		it_exchange_delete_transient_transaction( 'paypal-standard', $payment_id );
+		it_exchange_delete_transient_transaction( '2checkout', $payment_id );
 
 		return it_exchange_add_transaction( '2checkout', $invoice_id, 'paid', $transient_data[ 'customer_id' ], $transient_data[ 'transaction_object' ] );
 	}
