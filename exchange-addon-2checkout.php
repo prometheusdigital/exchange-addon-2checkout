@@ -41,6 +41,18 @@ function it_exchange_register_2checkout_addon() {
 add_action( 'it_exchange_register_addons', 'it_exchange_register_2checkout_addon' );
 
 /**
+ * Require other add-ons that may be needed
+ *
+ * @since 1.0.0
+ */
+function it_exchange_2checkout_required_addons() {
+
+	add_filter( 'it_exchange_billing_address_purchase_requirement_enabled', '__return_true' );
+
+}
+add_action( 'it_exchange_enabled_addons_loaded', 'it_exchange_2checkout_required_addons' );
+
+/**
  * Loads the translation data for WordPress
  *
  * @since 1.0.0
