@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: iThemes Exchange - 2Checkout Add-on
- * Version: 1.0.2
+ * Version: 1.0.3
  * Description: Adds the ability for users to checkout with 2Checkout.
  * Plugin URI: http://ithemes.com/exchange/2checkout/
  * Author: WebDevStudios
