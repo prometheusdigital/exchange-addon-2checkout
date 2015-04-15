@@ -280,7 +280,7 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 		'currency_code' => $transaction_object->currency,
 		'merchant_order_id' => $transaction_object->ID,
 		'pay_method' => $settings[ '2checkout_default_payment_method' ],
-		'x_receipt_link_url' => add_query_arg( array( 'it-exchange-transaction-method' => '2checkout', 'it-exchange-transaction-return' => 'complete' ), it_exchange_get_page_url( 'transaction' ) ),
+		'x_receipt_link_url' => esc_url( add_query_arg( array( 'it-exchange-transaction-method' => '2checkout', 'it-exchange-transaction-return' => 'complete' ), it_exchange_get_page_url( 'transaction' ) ) ),
 
 		// 'lang' => 'en', @todo Multi-lingual support
 		// 'coupon' => '', @todo 2Checkout coupon support
