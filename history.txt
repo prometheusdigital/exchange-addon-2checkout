@@ -14,3 +14,5 @@
 1.0.5 - 2014-11-14 - Packaging Bot (lib/updater)
 	Enhancement: Reduced caching to allow updates to appear more quickly.
 	Enhancement: Authenticating users now uses the new authentication system.
+1.1.0 - 2015-04-20 - Lew Ayotte
+	Multiple updates involving add_query_arg and remove_query_arg to esc_url()
