@@ -20,3 +20,5 @@
 	Compatibility Fix: Updated plugin and theme update data format to match changes in WordPress 4.2.
 1.2.0 - 2015-06-30 - Lew Ayotte
 	Adding warning when deactivating payment gateway
+1.2.1 - 2015-07-14 - Packaging Bot (lib/updater)
+	Enhancement: Updated link to iThemes support.
