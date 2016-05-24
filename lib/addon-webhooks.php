@@ -107,11 +107,17 @@ function it_exchange_2checkout_addon_process_webhook( $request ) {
 		return;
 	}
 
-	if ( !empty( $payment_id ) && $transient_data = it_exchange_get_transient_transaction( '2checkout', $payment_id ) ) {
+	$transaction = it_exchange_get_transaction_by_method_id( '2checkout', $invoice_id );
 
-		$tid = it_exchange_add_transaction( '2checkout', $invoice_id, 'paid', $transient_data[ 'customer_id' ], $transient_data[ 'transaction_object' ] );
+	if ( $transaction ) {
+		return;
+	}
 
-		it_exchange_update_transient_transaction( '2checkout', $payment_id, $transient_data['customer_id'], $transient_data['transaction_object'], $tid );
+	if ( !empty( $payment_id ) && $transient = it_exchange_get_transient_transaction( '2checkout', $payment_id ) ) {
+
+		$tid = it_exchange_add_transaction( '2checkout', $invoice_id, 'paid', $transient[ 'customer_id' ], $transient[ 'transaction_object' ] );
+
+		it_exchange_update_transient_transaction( '2checkout', $payment_id, $transient['customer_id'], $transient['transaction_object'], $tid );
 	}
 }
 
