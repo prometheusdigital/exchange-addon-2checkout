@@ -104,15 +104,15 @@ function it_exchange_2checkout_addon_process_webhook( $request ) {
 	catch ( Exception $e ) {
 		it_exchange_add_message( 'error', $e->getMessage() );
 
-		return false;
+		return;
 	}
 
 	if ( !empty( $payment_id ) && $transient_data = it_exchange_get_transient_transaction( '2checkout', $payment_id ) ) {
-		it_exchange_delete_transient_transaction( '2checkout', $payment_id );
 
-		return it_exchange_add_transaction( '2checkout', $invoice_id, 'paid', $transient_data[ 'customer_id' ], $transient_data[ 'transaction_object' ] );
+		$tid = it_exchange_add_transaction( '2checkout', $invoice_id, 'paid', $transient_data[ 'customer_id' ], $transient_data[ 'transaction_object' ] );
+
+		it_exchange_update_transient_transaction( '2checkout', $payment_id, $transient_data['customer_id'], $transient_data['transaction_object'], $tid );
 	}
-
 }
 
 add_action( 'it_exchange_webhook_it_exchange_2checkout', 'it_exchange_2checkout_addon_process_webhook' );

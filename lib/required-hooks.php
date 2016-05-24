@@ -47,11 +47,33 @@ function it_exchange_2checkout_addon_process_transaction( $status, $transaction_
 
 	// If this has been modified as true already, return.
 	if ( $status || !isset( $_REQUEST[ 'ite-2checkout-purchase-dialog-nonce' ] ) ) {
-
 		return $status;
 	}
 
-	return true;
+	if ( isset( $_REQUEST['vendor_order_id'] ) ) {
+		$payment_id = $_REQUEST['vendor_order_id'];
+	} elseif ( isset( $_REQUEST['merchant_order_id'] ) ) {
+		$payment_id = $_REQUEST['merchant_order_id'];
+	} else {
+		return true;
+	}
+
+	$i = 3;
+
+	do {
+
+		$transient = it_exchange_get_transient_transaction( '2checkout', $payment_id );
+
+		if ( ! empty( $transient['transaction_id'] ) ) {
+			return $transient['transaction_id'];
+		}
+
+		$i -= 1;
+
+		sleep( 2 );
+	} while( $i > 0 );
+
+	return false;
 
 }
 add_filter( 'it_exchange_do_transaction_2checkout', 'it_exchange_2checkout_addon_process_transaction', 10, 2 );
