@@ -46,7 +46,7 @@ add_filter( 'it_exchange_refund_url_for_2checkout', 'it_exchange_refund_url_for_
 function it_exchange_2checkout_addon_process_transaction( $status, $transaction_object ) {
 
 	// If this has been modified as true already, return.
-	if ( $status || !isset( $_REQUEST[ 'ite-2checkout-purchase-dialog-nonce' ] ) ) {
+	if ( $status ) {
 		return $status;
 	}
 
