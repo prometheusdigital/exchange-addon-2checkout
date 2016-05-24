@@ -77,6 +77,7 @@ function it_exchange_2checkout_addon_default_settings( $values ) {
         '2checkout_sid'                    => '',
         '2checkout_secret'                 => '',
 		'2checkout_default_payment_method' => 'CC',
+        '2checkout_demo_mode'              => false,
         '2checkout_sandbox_mode'           => false,
         '2checkout_purchase_button_label'  => __( 'Purchase', 'LION' ),
     );
@@ -224,9 +225,15 @@ class IT_Exchange_2Checkout_Add_On {
 				?>
             </p>
 
+            <h4><?php _e( 'Is this a Sandbox account?', 'LION' ); ?></h4>
+            <p>
+                <?php $form->add_check_box( '2checkout_sandbox_mode', array( 'class' => 'show-sandbox-mode-options' ) ); ?>
+                <label for="2checkout_sandbox_mode"><?php _e( '2Checkout Sandbox Account?', 'LION' ); ?> <span class="tip" title="<?php esc_attr_e( 'Enable if this is a 2Checkout Sandbox account.', 'LION' ); ?>">i</span></label>
+            </p>
+
             <h4><?php _e( 'Optional: Enable 2Checkout Demo Mode', 'LION' ); ?></h4>
             <p>
-                <?php $form->add_check_box( '2checkout_sandbox_mode', array( 'class' => 'show-test-mode-options' ) ); ?>
+                <?php $form->add_check_box( '2checkout_demo_mode', array( 'class' => 'show-test-mode-options' ) ); ?>
                 <label for="2checkout_sandbox_mode"><?php _e( 'Enable 2Checkout Demo Mode?', 'LION' ); ?> <span class="tip" title="<?php esc_attr_e( 'Use this mode for testing your store. This mode will need to be disabled when the store is ready to process customer payments.', 'LION' ); ?>">i</span></label>
             </p>
 

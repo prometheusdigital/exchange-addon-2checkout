@@ -251,6 +251,9 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 	// Pass through Products
 	// https://www.2checkout.com/documentation/checkout/parameter-sets/pass-through-products/
 
+	Twocheckout::sellerId( $settings['2checkout_sid'] );
+	Twocheckout::sandbox( $settings['2checkout_sandbox_mode'] );
+
 	$twocheckout_data = array(
 		// Customer information
 		'card_holder_name' => trim( $billing_address[ 'first-name' ] . ' ' . $billing_address[ 'last-name' ] ),
@@ -275,7 +278,6 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 		'ship_country' => $shipping_address[ 'country' ],
 
 		// API settings
-		'sid' => $settings[ '2checkout_sid' ],
 		'mode' => '2CO',
 		'currency_code' => $transaction_object->currency,
 		'merchant_order_id' => $transaction_object->ID,
@@ -288,7 +290,7 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 		'notify' => get_site_url() . '/?' . it_exchange_get_webhook( '2checkout' ) . '=1',
 	);
 
-	if ( $settings[ '2checkout_sandbox_mode' ] ) {
+	if ( $settings[ '2checkout_demo_mode' ] ) {
 		$twocheckout_data[ 'demo' ] = 'Y';
 	}
 

@@ -59,7 +59,7 @@ function it_exchange_2checkout_addon_process_webhook( $request ) {
 				$check_key = $sale_id . $vendor_id . $invoice_id . $twocheckout_secret;
 				$check_md5 = strtoupper( md5( $check_key ) );
 
-				if ( $settings[ '2checkout_sandbox_mode' ] ) {
+				if ( $settings[ '2checkout_demo_mode' ] ) {
 					$_REQUEST[ 'md5_hash' ] = $check_md5;
 					$vendor_id = $twocheckout_sid;
 				}
@@ -82,7 +82,7 @@ function it_exchange_2checkout_addon_process_webhook( $request ) {
 
 				$check_md5 = strtoupper( md5( $check_key ) );
 
-				if ( $settings[ '2checkout_sandbox_mode' ] ) {
+				if ( $settings[ '2checkout_demo_mode' ] ) {
 					$_REQUEST[ 'key' ] = $check_md5;
 				}
 
