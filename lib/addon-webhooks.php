@@ -102,14 +102,17 @@ function it_exchange_2checkout_addon_process_webhook( $request ) {
 		}
 	}
 	catch ( Exception $e ) {
-		it_exchange_add_message( 'error', $e->getMessage() );
-
 		return;
 	}
+
+	it_exchange_lock( "2checkout-$invoice_id", 2 );
 
 	$transaction = it_exchange_get_transaction_by_method_id( '2checkout', $invoice_id );
 
 	if ( $transaction ) {
+
+		it_exchange_release_lock( "2checkout-$invoice_id" );
+
 		return;
 	}
 
@@ -119,6 +122,8 @@ function it_exchange_2checkout_addon_process_webhook( $request ) {
 
 		it_exchange_update_transient_transaction( '2checkout', $payment_id, $transient['customer_id'], $transient['transaction_object'], $tid );
 	}
+
+	it_exchange_release_lock( "2checkout-$invoice_id" );
 }
 
 add_action( 'it_exchange_webhook_it_exchange_2checkout', 'it_exchange_2checkout_addon_process_webhook' );
