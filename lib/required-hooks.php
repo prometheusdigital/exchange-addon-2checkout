@@ -17,6 +17,8 @@
  *
  * @param string $url passed by WP filter.
  * @param string $url transaction URL
+ *                    
+ * @return string
 */
 function it_exchange_refund_url_for_2checkout( $url ) {
 	return 'https://www.2checkout.com/va/sales/';
@@ -38,6 +40,8 @@ add_filter( 'it_exchange_refund_url_for_2checkout', 'it_exchange_refund_url_for_
  *
  * @param string $status passed by WP filter.
  * @param object $transaction_object The transaction object
+ *                                   
+ * @return bool
 */
 function it_exchange_2checkout_addon_process_transaction( $status, $transaction_object ) {
 
@@ -77,7 +81,7 @@ function it_exchange_2checkout_addon_make_payment_button( $button, $options ) {
 
 	$temp_id = it_exchange_create_unique_hash();
 
-	it_exchange_add_transient_transaction( '2checkout', $temp_id, $it_exchange_customer->id, $transaction_object );
+	it_exchange_update_transient_transaction( '2checkout', $temp_id, $it_exchange_customer->id, $transaction_object );
 
 	$transaction_object->ID = $temp_id;
 
@@ -132,8 +136,9 @@ add_filter( 'it_exchange_transaction_status_label_2checkout', 'it_exchange_2chec
  *
  * @since 1.0.0
  *
- * @param boolean $cleared passed in through WP filter. Ignored here.
- * @param object $transaction
+ * @param boolean                 $cleared passed in through WP filter. Ignored here.
+ * @param IT_Exchange_Transaction $transaction
+ * 
  * @return boolean
 */
 function it_exchange_2checkout_transaction_is_cleared_for_delivery( $cleared, $transaction ) {
@@ -142,9 +147,6 @@ function it_exchange_2checkout_transaction_is_cleared_for_delivery( $cleared, $t
     return in_array( it_exchange_get_transaction_status( $transaction ), $valid_stati );
 }
 add_filter( 'it_exchange_2checkout_transaction_is_cleared_for_delivery', 'it_exchange_2checkout_transaction_is_cleared_for_delivery', 10, 2 );
-
-
-
 
 /**
  * Returns the Unsubscribe button for 2Checkout

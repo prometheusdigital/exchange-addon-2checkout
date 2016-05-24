@@ -365,7 +365,7 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 
 	ob_start();
 
-	Twocheckout_Charge::direct( $twocheckout_data, $settings[ '2checkout_purchase_button_label' ] );
+	Twocheckout_Charge::form( $twocheckout_data, $settings[ '2checkout_purchase_button_label' ] );
 
 	return ob_get_clean();
 }
