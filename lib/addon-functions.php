@@ -279,6 +279,7 @@ function it_exchange_2checkout_addon_direct_checkout( $it_exchange_customer, $tr
 
 		// API settings
 		'mode' => '2CO',
+		'sid' => $settings['2checkout_sid'],
 		'currency_code' => $transaction_object->currency,
 		'merchant_order_id' => $transaction_object->ID,
 		'pay_method' => $settings[ '2checkout_default_payment_method' ],
