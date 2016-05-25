@@ -58,7 +58,7 @@ function it_exchange_2checkout_addon_process_transaction( $status, $transaction_
 		return true;
 	}
 
-	$i = 3;
+	$i = 5;
 
 	do {
 
@@ -67,6 +67,8 @@ function it_exchange_2checkout_addon_process_transaction( $status, $transaction_
 		if ( ! empty( $transient['transaction_id'] ) ) {
 			return $transient['transaction_id'];
 		}
+
+		wp_cache_delete( 'alloptions', 'options' );
 
 		$i -= 1;
 
