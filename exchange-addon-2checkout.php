@@ -77,7 +77,7 @@ function ithemes_exchange_addon_2checkout_updater_register( $updater ) {
 
 }
 add_action( 'ithemes_updater_register', 'ithemes_exchange_addon_2checkout_updater_register' );
-require( dirname( __FILE__ ) . '/lib/updater/load.php' );
+// require( dirname( __FILE__ ) . '/lib/updater/load.php' );
 
 function ithemes_exchange_2checkout_deactivate() {
 	if ( empty( $_GET['remove-gateway'] ) || 'yes' !== $_GET['remove-gateway'] ) {
