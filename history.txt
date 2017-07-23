@@ -22,3 +22,6 @@
 	Adding warning when deactivating payment gateway
 1.2.1 - 2015-07-14 - Packaging Bot (lib/updater)
 	Enhancement: Updated link to iThemes support.
+1.2.2 - 2017-08-01 - Rebranded as ExchangeWP
+	Enhancement: New License Key System
+	Enhancement: Rebranded from iThemes Exchange to ExchangeWP
