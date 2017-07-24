@@ -122,20 +122,13 @@ class IT_Exchange_2Checkout_Add_On {
      * @since 1.0.0
     */
     var $error_message;
-    // $license = get_option( 'exchange_2checkout_license_key' );
-    // $status  = get_option( 'exchange_2checkout_license_status' );
 
-    /**
-     * @var string $license will be displayed if not empty
-     * @since 1.2.2
-    */
-    var $license;
-
-    /**
-     * @var string $status will be displayed if not empty
-     * @since 1.2.2
-    */
-    var $exstatus;
+    // this is the URL our updater / license checker pings. This should be the URL of the site with EDD installed
+    // const EXCHANGE_2CHECKOUT_STORE_URL = 'https://exchangewp.com';
+    // the name of your product. This should match the download name in EDD exactly
+    // const EXCHANGE_2CHECKOUT_ITEM_NAME = '2checkout';
+    // the name of the settings page for the license input to be displayed
+    // const EXCHANGE_2CHECKOUT_PLUGIN_LICENSE_PAGE = '2checkout-license';
 
     /**
      * Set up the class
@@ -146,8 +139,8 @@ class IT_Exchange_2Checkout_Add_On {
         $this->_is_admin       = is_admin();
         $this->_current_page   = empty( $_GET['page'] ) ? false : $_GET['page'];
         $this->_current_add_on = empty( $_GET['add-on-settings'] ) ? false : $_GET['add-on-settings'];
-        $this->license = get_option( 'exchange_2checkout_license_key' );
-        $this->exstatus  = get_option( 'exchange_2checkout_license_status' );
+        // $this->license = get_option( 'exchange_2checkout_license_key' );
+        // $this->exstatus  = trim( get_option( 'exchange_2checkout_license_status' ) );
 
         if ( !empty( $_POST ) && $this->_is_admin && 'it-exchange-addons' == $this->_current_page && '2checkout' == $this->_current_add_on ) {
             add_action( 'it_exchange_save_add_on_settings_2checkout', array( $this, 'save_settings' ) );
@@ -204,11 +197,11 @@ class IT_Exchange_2Checkout_Add_On {
 
             <?php do_action( 'it_exchange_paypa-pro_settings_page_top' ); ?>
             <?php do_action( 'it_exchange_addon_settings_page_top' ); ?>
-            <?php #include( 'license_form.php' ); ?>
+
             <?php $form->start_form( $form_options, 'it-exchange-2checkout-settings' ); ?>
                 <?php do_action( 'it_exchange_2checkout_settings_form_top' ); ?>
                 <?php $this->get_form_table( $form, $form_values ); ?>
-                <?php settings_fields('exchange_2checkout_license'); ?>
+                <?php #settings_fields('exchange_2checkout_license'); ?>
                 <?php do_action( 'it_exchange_2checkout_settings_form_bottom' ); ?>
                 <p class="submit">
                     <?php $form->add_submit( 'submit', array( 'value' => __( 'Save Changes', 'LION' ), 'class' => 'button button-primary button-large' ) ); ?>
@@ -219,33 +212,7 @@ class IT_Exchange_2Checkout_Add_On {
         </div>
         <?php
     }
-
-
-    // this is the URL our updater / license checker pings. This should be the URL of the site with EDD installed
-    const EXCHANGE_2CHECKOUT_STORE_URL = 'https://exchangewp.com';
-    // the name of your product. This should match the download name in EDD exactly
-    const EXCHANGE_2CHECKOUT_ITEM_NAME = '2checkout';
-    // the name of the settings page for the license input to be displayed
-    const EXCHANGE_2CHECKOUT_PLUGIN_LICENSE_PAGE = '2checkout-license';
-
-
-    function exchange_2checkout_plugin_updater() {
-
-    	// retrieve our license key from the DB
-    	$license_key = trim( get_option( 'exchange_2checkout_license_key' ) );
-
-    	// setup the updater
-    	$edd_updater = new EDD_SL_Plugin_Updater( EXCHANGE_2CHECKOUT_STORE_URL, __FILE__, array(
-    			'version' 	=> '1.2.1', 				// current version number
-    			'license' 	=> $license_key, 		// license key (used get_option above to retrieve from DB)
-    			'item_name' => EXCHANGE_2CHECKOUT_ITEM_NAME, 	// name of this plugin
-    			'author' 	=> 'AJ Morris',  // author of this plugin
-    			'beta'		=> false
-    		)
-    	);
-
-    }
-
+    
     /**
      * Builds Settings Form Table
      *
@@ -259,10 +226,6 @@ class IT_Exchange_2Checkout_Add_On {
     			}
     		}
 
-        // print_r('<pre> License'. $license . '</pre>');
-        // print_r('<pre> Status'. $status . '</pre>');
-        // die();
-
         if ( !empty( $_GET['page'] ) && 'it-exchange-setup' == $_GET['page'] ) : ?>
             <h3><?php _e( '2Checkout', 'LION' ); ?></h3>
         <?php endif; ?>
@@ -272,6 +235,30 @@ class IT_Exchange_2Checkout_Add_On {
             </p>
             <p>
                 <?php _e( 'Don\'t have a 2Checkout account yet?', 'LION' ); ?> <a href="https://www.2checkout.com/signup" target="_blank"><?php _e( 'Go set one up here', 'LION' ); ?></a>.
+            </p>
+            <h4>License Key</h4>
+
+            <?php
+                $exchangewp_2checkout_options = get_option( 'it-storage-exchange_addon_2checkout' );
+                $license = $exchangewp_2checkout_options['2checkout_license'];
+                // var_dump($license);
+                $exstatus = trim( get_option( 'exchange_2checkout_license_status' ) );
+                // var_dump($exstatus);
+             ?>
+            <p>
+              <label class="description" for="exchange_2checkout_license_key"><?php _e('Enter your license key'); ?></label>
+              <!-- <input id="2checkout_license" name="it-exchange-add-on-2checkout-2checkout_license" type="text" value="<?php #esc_attr_e( $license ); ?>" /> -->
+              <?php $form->add_text_box( '2checkout_license' ); ?>
+              <span>
+                <?php if( $exstatus !== false && $exstatus == 'valid' ) { ?>
+    							<span style="color:green;"><?php _e('active'); ?></span>
+    							<?php wp_nonce_field( 'exchange_2checkout_nonce', 'exchange_2checkout_nonce' ); ?>
+    							<input type="submit" class="button-secondary" name="exchange_2checkout_license_deactivate" value="<?php _e('Deactivate License'); ?>"/>
+    						<?php } else {
+    							wp_nonce_field( 'exchange_2checkout_nonce', 'exchange_2checkout_nonce' ); ?>
+    							<input type="submit" class="button-secondary" name="exchange_2checkout_license_activate" value="<?php _e('Activate License'); ?>"/>
+    						<?php } ?>
+              </span>
             </p>
             <h4><?php _e( 'Fill out your 2Checkout API Credentials', 'LION' ); ?></h4>
             <p>
@@ -334,231 +321,159 @@ class IT_Exchange_2Checkout_Add_On {
         } else {
             $this->status_message = __( 'Settings not saved.', 'LION' );
         }
+        // listen for our activate button to be clicked
+      	if( isset( $_POST['exchange_2checkout_license_activate'] ) ) {
+
+      		// run a quick security check
+      	 	if( ! check_admin_referer( 'exchange_2checkout_nonce', 'exchange_2checkout_nonce' ) )
+      			return; // get out if we didn't click the Activate button
+
+      		// retrieve the license from the database
+      		// $license = trim( get_option( 'exchange_2checkout_license_key' ) );
+          $exchangewp_2checkout_options = get_option( 'it-storage-exchange_addon_2checkout' );
+          $license = trim( $exchangewp_2checkout_options['2checkout_license'] );
+
+      		// data to send in our API request
+      		$api_params = array(
+      			'edd_action' => 'activate_license',
+      			'license'    => $license,
+      			'item_name'  => urlencode( '2checkout' ), // the name of our product in EDD
+      			'url'        => home_url()
+      		);
+
+      		// Call the custom API.
+      		$response = wp_remote_post( 'https://exchangewp.com', array( 'timeout' => 15, 'sslverify' => false, 'body' => $api_params ) );
+
+      		// make sure the response came back okay
+      		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+
+      			if ( is_wp_error( $response ) ) {
+      				$message = $response->get_error_message();
+      			} else {
+      				$message = __( 'An error occurred, please try again.' );
+      			}
+
+      		} else {
+
+      			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+
+      			if ( false === $license_data->success ) {
+
+      				switch( $license_data->error ) {
+
+      					case 'expired' :
+
+      						$message = sprintf(
+      							__( 'Your license key expired on %s.' ),
+      							date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) )
+      						);
+      						break;
+
+      					case 'revoked' :
+
+      						$message = __( 'Your license key has been disabled.' );
+      						break;
+
+      					case 'missing' :
+
+      						$message = __( 'Invalid license.' );
+      						break;
+
+      					case 'invalid' :
+      					case 'site_inactive' :
+
+      						$message = __( 'Your license is not active for this URL.' );
+      						break;
+
+      					case 'item_name_mismatch' :
+
+      						$message = sprintf( __( 'This appears to be an invalid license key for %s.' ), '2checkout' );
+      						break;
+
+      					case 'no_activations_left':
+
+      						$message = __( 'Your license key has reached its activation limit.' );
+      						break;
+
+      					default :
+
+      						$message = __( 'An error occurred, please try again.' );
+      						break;
+      				}
+
+      			}
+
+      		}
+
+      		// Check if anything passed on a message constituting a failure
+      		if ( ! empty( $message ) ) {
+      			$base_url = admin_url( 'admin.php?page=' . '2checkout-license' );
+      			$redirect = add_query_arg( array( 'sl_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
+
+      			wp_redirect( $redirect );
+      			exit();
+      		}
+
+      		//$license_data->license will be either "valid" or "invalid"
+      		update_option( 'exchange_2checkout_license_status', $license_data->license );
+      		// wp_redirect( admin_url( 'admin.php?page=' . '2checkout-license' ) );
+      		exit();
+      	}
+
+        // deactivate here
+        // listen for our activate button to be clicked
+      	if( isset( $_POST['exchange_2checkout_license_deactivate'] ) ) {
+
+      		// run a quick security check
+      	 	if( ! check_admin_referer( 'exchange_2checkout_nonce', 'exchange_2checkout_nonce' ) )
+      			return; // get out if we didn't click the Activate button
+
+      		// retrieve the license from the database
+      		// $license = trim( get_option( 'exchange_2checkout_license_key' ) );
+
+          $exchangewp_2checkout_options = get_option( 'it-storage-exchange_addon_2checkout' );
+          $license = $exchangewp_2checkout_options['2checkout_license'];
+
+
+      		// data to send in our API request
+      		$api_params = array(
+      			'edd_action' => 'deactivate_license',
+      			'license'    => $license,
+      			'item_name'  => urlencode( '2checkout' ), // the name of our product in EDD
+      			'url'        => home_url()
+      		);
+      		// Call the custom API.
+      		$response = wp_remote_post( 'https://exchangewp.com', array( 'timeout' => 15, 'sslverify' => false, 'body' => $api_params ) );
+
+      		// make sure the response came back okay
+      		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+
+      			if ( is_wp_error( $response ) ) {
+      				$message = $response->get_error_message();
+      			} else {
+      				$message = __( 'An error occurred, please try again.' );
+      			}
+
+      			// $base_url = admin_url( 'admin.php?page=' . '2checkout-license' );
+      			// $redirect = add_query_arg( array( 'sl_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
+
+      			wp_redirect( 'admin.php?page=2checkout-license' );
+      			exit();
+      		}
+
+      		// decode the license data
+      		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+      		// $license_data->license will be either "deactivated" or "failed"
+      		if( $license_data->license == 'deactivated' ) {
+      			delete_option( 'exchange_2checkout_license_status' );
+      		}
+
+      		// wp_redirect( admin_url( 'admin.php?page=' . '2checkout-license' ) );
+      		exit();
+
+      	}
+
     }
-
-    /**
-     * Registers our key as an option
-     * in the options table.
-     *
-     * @since 1.2.1
-    */
-    function exchange_2checkout_register_option() {
-    	// creates our settings in the options table
-    	register_setting('exchange_2checkout_license', 'exchange_2checkout_license_key', 'edd_sanitize_license' );
-    }
-
-    /**
-     * Sanitizes the license key
-     *
-     * @since 1.2.1
-    */
-    function edd_sanitize_license( $new ) {
-    	$old = get_option( 'exchange_2checkout_license_key' );
-    	if( $old && $old != $new ) {
-    		delete_option( 'exchange_2checkout_license_status' ); // new license has been entered, so must reactivate
-    	}
-    	return $new;
-    }
-
-    /**
-     * Activates your license
-     *
-     * @since 1.2.2
-    */
-    function exchange_2checkout_activate_license() {
-
-    	// listen for our activate button to be clicked
-    	if( isset( $_POST['exchange_2checkout_license_activate'] ) ) {
-
-    		// run a quick security check
-    	 	if( ! check_admin_referer( 'exchange_2checkout_nonce', 'exchange_2checkout_nonce' ) )
-    			return; // get out if we didn't click the Activate button
-
-    		// retrieve the license from the database
-    		$license = trim( get_option( 'exchange_2checkout_license_key' ) );
-
-    		// data to send in our API request
-    		$api_params = array(
-    			'edd_action' => 'activate_license',
-    			'license'    => $license,
-    			'item_name'  => urlencode( EXCHANGE_2CHECKOUT_ITEM_NAME ), // the name of our product in EDD
-    			'url'        => home_url()
-    		);
-
-    		// Call the custom API.
-    		$response = wp_remote_post( EXCHANGE_2CHECKOUT_STORE_URL, array( 'timeout' => 15, 'sslverify' => false, 'body' => $api_params ) );
-
-    		// make sure the response came back okay
-    		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-
-    			if ( is_wp_error( $response ) ) {
-    				$message = $response->get_error_message();
-    			} else {
-    				$message = __( 'An error occurred, please try again.' );
-    			}
-
-    		} else {
-
-    			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-
-    			if ( false === $license_data->success ) {
-
-    				switch( $license_data->error ) {
-
-    					case 'expired' :
-
-    						$message = sprintf(
-    							__( 'Your license key expired on %s.' ),
-    							date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) )
-    						);
-    						break;
-
-    					case 'revoked' :
-
-    						$message = __( 'Your license key has been disabled.' );
-    						break;
-
-    					case 'missing' :
-
-    						$message = __( 'Invalid license.' );
-    						break;
-
-    					case 'invalid' :
-    					case 'site_inactive' :
-
-    						$message = __( 'Your license is not active for this URL.' );
-    						break;
-
-    					case 'item_name_mismatch' :
-
-    						$message = sprintf( __( 'This appears to be an invalid license key for %s.' ), EXCHANGE_2CHECKOUT_ITEM_NAME );
-    						break;
-
-    					case 'no_activations_left':
-
-    						$message = __( 'Your license key has reached its activation limit.' );
-    						break;
-
-    					default :
-
-    						$message = __( 'An error occurred, please try again.' );
-    						break;
-    				}
-
-    			}
-
-    		}
-
-    		// Check if anything passed on a message constituting a failure
-    		if ( ! empty( $message ) ) {
-    			$base_url = admin_url( 'admin.php?page=' . EXCHANGE_2CHECKOUT_PLUGIN_LICENSE_PAGE );
-    			$redirect = add_query_arg( array( 'sl_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
-
-    			wp_redirect( $redirect );
-    			exit();
-    		}
-
-    		// $license_data->license will be either "valid" or "invalid"
-
-    		update_option( 'exchange_2checkout_license_status', $license_data->license );
-    		wp_redirect( admin_url( 'admin.php?page=' . EXCHANGE_2CHECKOUT_PLUGIN_LICENSE_PAGE ) );
-    		exit();
-    	}
-    }
-
-    /**
-     * Deactivates License
-     *
-     * @since 1.2.2
-    */
-    function exchange_2checkout_deactivate_license() {
-
-    	// listen for our activate button to be clicked
-    	if( isset( $_POST['exchange_2checkout_license_deactivate'] ) ) {
-
-    		// run a quick security check
-    	 	if( ! check_admin_referer( 'exchange_2checkout_nonce', 'exchange_2checkout_nonce' ) )
-    			return; // get out if we didn't click the Activate button
-
-    		// retrieve the license from the database
-    		$license = trim( get_option( 'exchange_2checkout_license_key' ) );
-
-
-    		// data to send in our API request
-    		$api_params = array(
-    			'edd_action' => 'deactivate_license',
-    			'license'    => $license,
-    			'item_name'  => urlencode( EXCHANGE_2CHECKOUT_ITEM_NAME ), // the name of our product in EDD
-    			'url'        => home_url()
-    		);
-
-    		// Call the custom API.
-    		$response = wp_remote_post( EXCHANGE_2CHECKOUT_STORE_URL, array( 'timeout' => 15, 'sslverify' => false, 'body' => $api_params ) );
-
-    		// make sure the response came back okay
-    		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-
-    			if ( is_wp_error( $response ) ) {
-    				$message = $response->get_error_message();
-    			} else {
-    				$message = __( 'An error occurred, please try again.' );
-    			}
-
-    			$base_url = admin_url( 'admin.php?page=' . EXCHANGE_2CHECKOUT_PLUGIN_LICENSE_PAGE );
-    			$redirect = add_query_arg( array( 'sl_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
-
-    			wp_redirect( $redirect );
-    			exit();
-    		}
-
-    		// decode the license data
-    		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-
-    		// $license_data->license will be either "deactivated" or "failed"
-    		if( $license_data->license == 'deactivated' ) {
-    			delete_option( 'exchange_2checkout_license_status' );
-    		}
-
-    		wp_redirect( admin_url( 'admin.php?page=' . EXCHANGE_2CHECKOUT_PLUGIN_LICENSE_PAGE ) );
-    		exit();
-
-    	}
-    }
-
-    /**
-     * Checks license and is only needed if you need to do something custom.
-     *
-     * @since 1.2.2
-    */
-    // function exchange_2checkout_check_license() {
-    //
-    // 	global $wp_version;
-    //
-    // 	$license = trim( get_option( 'exchange_2checkout_license_key' ) );
-    //
-    // 	$api_params = array(
-    // 		'edd_action' => 'check_license',
-    // 		'license' => $license,
-    // 		'item_name' => urlencode( EXCHANGE_2CHECKOUT_ITEM_NAME ),
-    // 		'url'       => home_url()
-    // 	);
-    //
-    // 	// Call the custom API.
-    // 	$response = wp_remote_post( EXCHANGE_2CHECKOUT_STORE_URL, array( 'timeout' => 15, 'sslverify' => false, 'body' => $api_params ) );
-    //
-    // 	if ( is_wp_error( $response ) )
-    // 		return false;
-    //
-    // 	$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-    //
-    // 	if( $license_data->license == 'valid' ) {
-    // 		echo 'valid'; exit;
-    // 		// this license is still valid
-    // 	} else {
-    // 		echo 'invalid'; exit;
-    // 		// this license is no longer valid
-    // 	}
-    // }
 
     /**
      * This is a means of catching errors from the activation method above and displaying it to the customer

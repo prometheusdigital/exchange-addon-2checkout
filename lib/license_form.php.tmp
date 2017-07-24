@@ -1,4 +1,4 @@
-<form method="post" action="options.php">
+<form method="post" action="admin.php?page=it-exchange-addons&add-on-settings=2checkout">
 
 	<?php settings_fields('exchange_2checkout_license'); ?>
 

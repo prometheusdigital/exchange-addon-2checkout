@@ -1,11 +1,11 @@
 <?php
 /*
- * Plugin Name: iThemes Exchange - 2Checkout Add-on
- * Version: 1.2.1
+ * Plugin Name: ExchangeWP - 2Checkout Add-on
+ * Version: 1.2.0
  * Description: Adds the ability for users to checkout with 2Checkout.
- * Plugin URI: http://ithemes.com/exchange/2checkout/
- * Author: WebDevStudios
- * Author URI: http://webdevstudios.com
+ * Plugin URI: https://exchangewp.com/downloads/2checkout/
+ * Author: ExchangeWP
+ * Author URI: https://exchangewp.com
  * iThemes Package: exchange-addon-2checkout
 
  * Installation:
@@ -13,6 +13,7 @@
  * 2. If you use the WordPress plugin uploader to install this plugin skip to step 4.
  * 3. Upload the entire plugin directory to your `/wp-content/plugins/` directory.
  * 4. Activate the plugin through the 'Plugins' menu in WordPress Administration.
+ * 5. Add license key to the Plugin setting.
  *
 */
 
@@ -92,3 +93,33 @@ function ithemes_exchange_2checkout_deactivate() {
 	}
 }
 register_deactivation_hook( __FILE__, 'ithemes_exchange_2checkout_deactivate' );
+
+if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) )  {
+	require_once 'EDD_SL_Plugin_Updater.php';
+}
+
+function exchange_2checkout_plugin_updater() {
+
+	// retrieve our license key from the DB
+	// this is going to have to be pulled from a seralized array to get the actual key.
+	// $license_key = trim( get_option( 'exchange_2checkout_license_key' ) );
+	$exchangewp_2checkout_options = get_option( 'it-storage-exchange_addon_2checkout' );
+	$license_key = $exchangewp_2checkout_options['2checkout_license'];
+
+	// setup the updater
+	$edd_updater = new EDD_SL_Plugin_Updater( 'https://exchangewp.com', __FILE__, array(
+			'version' 		=> '1.2.0', 				// current version number
+			'license' 		=> $license_key, 		// license key (used get_option above to retrieve from DB)
+			'item_name' 	=> '2checkout', 	  // name of this plugin
+			'author' 	  	=> 'ExchangeWP',    // author of this plugin
+			'url'       	=> home_url(),
+			'wp_override' => true,
+			'beta'		  	=> false
+		)
+	);
+	// var_dump($edd_updater);
+	// die();
+
+}
+
+add_action( 'admin_init', 'exchange_2checkout_plugin_updater', 0 );
