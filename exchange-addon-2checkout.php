@@ -27,8 +27,8 @@ function it_exchange_register_2checkout_addon() {
 	$options = array(
 		'name' => __( '2Checkout', 'LION' ),
 		'description' => __( 'Process transactions via 2Checkout.', 'LION' ),
-		'author' => 'WebDevStudios',
-		'author_url' => 'http://webdevstudios.com',
+		'author' => 'ExchangeWP',
+		'author_url' => 'https://exchangewp.com',
 		'icon' => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/images/2checkout50px.png' ),
 		'wizard-icon' => ITUtility::get_url_from_file( dirname( __FILE__ ) . '/lib/images/wizard-2checkout.png' ),
 		'file' => dirname( __FILE__ ) . '/init.php',

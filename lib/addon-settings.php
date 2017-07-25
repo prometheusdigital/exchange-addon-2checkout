@@ -212,7 +212,7 @@ class IT_Exchange_2Checkout_Add_On {
         </div>
         <?php
     }
-    
+
     /**
      * Builds Settings Form Table
      *
@@ -321,6 +321,7 @@ class IT_Exchange_2Checkout_Add_On {
         } else {
             $this->status_message = __( 'Settings not saved.', 'LION' );
         }
+        // This is for all things licensing check
         // listen for our activate button to be clicked
       	if( isset( $_POST['exchange_2checkout_license_activate'] ) ) {
 
