@@ -6,7 +6,7 @@
  * Plugin URI: https://exchangewp.com/downloads/2checkout/
  * Author: ExchangeWP
  * Author URI: https://exchangewp.com
- * iThemes Package: exchange-addon-2checkout
+ * ExchangeWP Package: exchange-addon-2checkout
 
  * Installation:
  * 1. Download and unzip the latest release zip file.

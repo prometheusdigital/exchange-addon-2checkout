@@ -1,6 +1,6 @@
 <?php
 /**
- * iThemes Exchange 2Checkout Add-on
+ * ExchangeWP Exchange 2Checkout Add-on
  * @package IT_Exchange_Addon_2Checkout
  * @since 1.0.0
 */
