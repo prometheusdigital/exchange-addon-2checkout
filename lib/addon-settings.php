@@ -77,6 +77,7 @@ function it_exchange_2checkout_addon_default_settings( $values ) {
         '2checkout_sid'                    => '',
         '2checkout_secret'                 => '',
     		'2checkout_default_payment_method' => 'CC',
+        '2checkout_license'                => '',
         '2checkout_sandbox_mode'           => false,
         '2checkout_purchase_button_label'  => __( 'Purchase', 'LION' ),
     );
@@ -147,27 +148,6 @@ class IT_Exchange_2Checkout_Add_On {
             do_action( 'it_exchange_save_add_on_settings_2checkout' );
         }
 
-        // Creates our option in the database
-        add_action( 'admin_init', array( $this, 'exchange_2checkout_plugin_updater', 0 ) );
-        add_action( 'admin_init', array( $this, 'exchange_2checkout_register_option' ) );
-        add_action( 'admin_notices', array( $this, 'exchange_2checkout_admin_notices' ) );
-        add_action( 'admin_init', array( $this, 'exchange_2checkout_deactivate_license' ) );
-        add_action( 'admin_init', array( $this, 'exchange_2checkout_deactivate_license' ) );
-        add_action( 'admin_init', array( $this, 'exchange_2checkout_activate_license' ) );
-
-        $this->includes();
-    }
-
-    /**
-     * Include the updater class
-     *
-     * @access  private
-     * @return  void
-     */
-    private function includes() {
-      if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) )  {
-        require_once 'EDD_SL_Plugin_Updater.php';
-      }
     }
 
     /**
@@ -330,7 +310,6 @@ class IT_Exchange_2Checkout_Add_On {
       			return; // get out if we didn't click the Activate button
 
       		// retrieve the license from the database
-      		// $license = trim( get_option( 'exchange_2checkout_license_key' ) );
           $exchangewp_2checkout_options = get_option( 'it-storage-exchange_addon_2checkout' );
           $license = trim( $exchangewp_2checkout_options['2checkout_license'] );
 
@@ -411,14 +390,16 @@ class IT_Exchange_2Checkout_Add_On {
       			$base_url = admin_url( 'admin.php?page=' . '2checkout-license' );
       			$redirect = add_query_arg( array( 'sl_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
 
-      			wp_redirect( $redirect );
-      			exit();
+      			// wp_redirect( $redirect );
+      			// exit();
+            return;
       		}
 
       		//$license_data->license will be either "valid" or "invalid"
       		update_option( 'exchange_2checkout_license_status', $license_data->license );
       		// wp_redirect( admin_url( 'admin.php?page=' . '2checkout-license' ) );
-      		exit();
+      		// exit();
+          return;
       	}
 
         // deactivate here
@@ -458,8 +439,9 @@ class IT_Exchange_2Checkout_Add_On {
       			// $base_url = admin_url( 'admin.php?page=' . '2checkout-license' );
       			// $redirect = add_query_arg( array( 'sl_activation' => 'false', 'message' => urlencode( $message ) ), $base_url );
 
-      			wp_redirect( 'admin.php?page=2checkout-license' );
-      			exit();
+      			// wp_redirect( 'admin.php?page=2checkout-license' );
+      			// exit();
+            return;
       		}
 
       		// decode the license data
@@ -470,7 +452,8 @@ class IT_Exchange_2Checkout_Add_On {
       		}
 
       		// wp_redirect( admin_url( 'admin.php?page=' . '2checkout-license' ) );
-      		exit();
+      		// exit();
+          return;
 
       	}
 
