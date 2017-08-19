@@ -232,7 +232,7 @@ add_action( 'init', 'it_exchange_2checkout_unsubscribe_action_submit' );
  *
  * @since 1.3.1
  *
- * @param object $transaction iThemes Transaction object
+ * @param object $transaction ExchangeWP Transaction object
  * @return void
 */
 function it_exchange_2checkout_after_payment_details_cancel_url( $transaction = null ) {

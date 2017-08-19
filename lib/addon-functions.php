@@ -413,6 +413,8 @@ function it_exchange_2checkout_addon_update_profile_status( $profile_id, $action
 	$args = array(
 		'method' => 'POST',
 		'body' => $twocheckout_data,
+    // Need to look into seeing if it's possible to change this
+    // and what the reprecussions would be.
 		'user-agent' => 'iThemes Exchange',
 		'timeout' => 90,
 		'sslverify' => false
