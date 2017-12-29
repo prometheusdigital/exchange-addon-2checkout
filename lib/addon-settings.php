@@ -140,8 +140,6 @@ class IT_Exchange_2Checkout_Add_On {
         $this->_is_admin       = is_admin();
         $this->_current_page   = empty( $_GET['page'] ) ? false : $_GET['page'];
         $this->_current_add_on = empty( $_GET['add-on-settings'] ) ? false : $_GET['add-on-settings'];
-        // $this->license = get_option( 'exchange_2checkout_license_key' );
-        // $this->exstatus  = trim( get_option( 'exchange_2checkout_license_status' ) );
 
         if ( !empty( $_POST ) && $this->_is_admin && 'it-exchange-addons' == $this->_current_page && '2checkout' == $this->_current_add_on ) {
             add_action( 'it_exchange_save_add_on_settings_2checkout', array( $this, 'save_settings' ) );
