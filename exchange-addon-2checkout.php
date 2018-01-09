@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: ExchangeWP - 2Checkout Add-on
- * Version: 1.2.2
+ * Version: 1.2.3
  * Description: Adds the ability for users to checkout with 2Checkout.
  * Plugin URI: https://exchangewp.com/downloads/2checkout/
  * Author: ExchangeWP
@@ -65,20 +65,6 @@ function it_exchange_2checkout_set_textdomain() {
 }
 add_action( 'plugins_loaded', 'it_exchange_2checkout_set_textdomain' );
 
-/**
- * Registers Plugin with iThemes updater class
- *
- * @since 1.0.0
- *
- * @param object $updater ithemes updater object
- */
-function ithemes_exchange_addon_2checkout_updater_register( $updater ) {
-
-	$updater->register( 'exchange-addon-2checkout', __FILE__ );
-
-}
-add_action( 'ithemes_updater_register', 'ithemes_exchange_addon_2checkout_updater_register' );
-
 function ithemes_exchange_2checkout_deactivate() {
 	if ( empty( $_GET['remove-gateway'] ) || 'yes' !== $_GET['remove-gateway'] ) {
 		$title = __( 'Payment Gateway Warning', 'LION' );
@@ -94,31 +80,24 @@ function ithemes_exchange_2checkout_deactivate() {
 }
 register_deactivation_hook( __FILE__, 'ithemes_exchange_2checkout_deactivate' );
 
-if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) )  {
-	require_once 'EDD_SL_Plugin_Updater.php';
-}
-
 function exchange_2checkout_plugin_updater() {
+	$license_check = get_transient( 'exchangewp_license_check' );
 
-	// retrieve our license key from the DB
-	// this is going to have to be pulled from a seralized array to get the actual key.
-	// $license_key = trim( get_option( 'exchange_2checkout_license_key' ) );
-	$exchangewp_2checkout_options = get_option( 'it-storage-exchange_addon_2checkout' );
-	$license_key = $exchangewp_2checkout_options['2checkout_license'];
+	if ($license_check->license == 'valid' ) {
+		$license_key = it_exchange_get_option( 'exchangewp_licenses' );
+		$license = $license_key['exchange_license'];
 
-	// setup the updater
-	$edd_updater = new EDD_SL_Plugin_Updater( 'https://exchangewp.com', __FILE__, array(
-			'version' 		=> '1.2.2', 				// current version number
-			'license' 		=> $license_key, 		// license key (used get_option above to retrieve from DB)
-			'item_name' 	=> '2checkout', 	  // name of this plugin
-			'author' 	  	=> 'ExchangeWP',    // author of this plugin
-			'url'       	=> home_url(),
-			'wp_override' => true,
-			'beta'		  	=> false
-		)
-	);
-	// var_dump($edd_updater);
-	// die();
+		$edd_updater = new EDD_SL_Plugin_Updater( 'https://exchangewp.com', __FILE__, array(
+				'version' 		=> '1.2.3', 				// current version number
+				'license' 		=> $license, 				// license key (used get_option above to retrieve from DB)
+				'item_id' 	 	=> 265,					 	  // name of this plugin
+				'author' 	  	=> 'ExchangeWP',    // author of this plugin
+				'url'       	=> home_url(),
+				'wp_override' => true,
+				'beta'		  	=> false
+			)
+		);
+	}
 
 }
 
